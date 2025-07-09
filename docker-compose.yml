@@ -1,0 +1,71 @@
+version: '3.8'
+
+services:
+  userservice:
+    build: . # Собирает образ из Dockerfile в текущей директории
+    ports:
+      - "8080:8080"
+    depends_on: # Указывает зависимости между сервисами
+      postgres:
+        condition: service_healthy  # Ждем, пока postgres не станет healthy
+      redis:
+        condition: service_healthy # Ждем, пока redis не станет healthy
+    environment:
+      #- DB_HOST=postgres
+      #- DB_USER=postgres
+      #- DB_PASSWORD=Kaiko1994Ulia
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_NAME=userserviceDB
+      - DB_USER=postgres
+      - DB_PASSWORD=Kaiko1994Ulia
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/userserviceDB
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=Kaiko1994Ulia
+      - REDIS_HOST=redis
+      - SPRING_DATA_REDIS_USERNAME=default
+      - SPRING_DATA_REDIS_PASSWORD=12345
+    networks:
+      - myproject-network
+
+  postgres:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: userserviceDB # Создает БД при старте
+      POSTGRES_USER: postgres # Создает пользователя
+      POSTGRES_PASSWORD: Kaiko1994Ulia  # Пароль пользователя
+    ports:
+      - "5432:5432" # Пробрасывает порт PostgreSQL на хост
+    volumes:
+      - postgres-data:/var/lib/postgresql/data # Сохраняет данные в volume
+    healthcheck: # Проверка здоровья контейнера
+      test: ["CMD-SHELL", "pg_isready -U postgres"]  # Команда проверки
+      interval: 5s # Проверка каждые 5 секунд
+      timeout: 5s # Таймаут проверки
+      retries: 5 # Количество попыток
+    networks:
+      - myproject-network
+
+  redis:
+    image: redis:7
+    #command: redis-server --requirepass redis # Запускает Redis с паролем "redis"
+    command: --requirepass 12345
+    ports:
+      - "6379:6379"
+    environment:
+      - REDIS_USERNAME=default
+      - REDIS_PASSWORD=12345
+    healthcheck:
+      test: [ "CMD", "redis-cli", "-a", "12345", "ping" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - myproject-network
+
+volumes:
+  postgres-data: # Создает именованный том для хранения данных PostgreSQL
+
+networks: # Добавила сеть, чтобы все сервисы находились в одной сети и ушла ошибка с DNS (userservice не может найти сервис redis)
+  myproject-network:
+    driver: bridge

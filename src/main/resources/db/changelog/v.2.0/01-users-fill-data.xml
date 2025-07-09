@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:pro="http://www.liquibase.org/xml/ns/pro"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.1.xsd
+      http://www.liquibase.org/xml/ns/pro
+      http://www.liquibase.org/xml/ns/pro/liquibase-pro-4.1.xsd">
+
+    <changeSet id="users_fill_data_1" author="julia_kaiko">
+        <preConditions>
+            <tableExists tableName="users"/>
+        </preConditions>
+        <!-- https://bcrypt-generator.com/  -->
+        <sql>
+            INSERT INTO users (name, surname, birth_date, email, password, role) VALUES ('Julia','Kaiko','1994-12-07','user1@yandex.ru', '{bcrypt}$2a$12$1EDnhmvIzEtbZ5vxztnGnu0Pux3.7fZ.LQKwgVOw7MqkCACNavjVS','USER'); <!-- user1 -->
+            INSERT INTO users (name, surname, birth_date, email, password, role) VALUES ('Anna','Smith','1990-05-15','user2@yandex.ru', '{bcrypt}$2a$12$8P3uoDWfGEdIe3boxdm0hOAuJBWGgHAdV/M/eZntaWFY07JjjRYdK','USER');
+            INSERT INTO users (name, surname, birth_date, email, password, role) VALUES ('Michael','Johnson','1985-08-22','user3@yandex.ru', '{bcrypt}$2a$12$z2k5hXSJjvutw6wKfN3x2.Liz1SDn1It7XIoWZIEXYsjUM8fb4lu6','USER');
+            INSERT INTO users (name, surname, birth_date, email, password, role) VALUES ('Emily','Brown','1992-03-30','user4@yandex.ru', '{bcrypt}$2a$12$5G.yrt6JiyjCC/Z5DivekeRZDfSgO5RyM1gw.gbr.s4VT92j6bpkO','USER');
+            INSERT INTO users (name, surname, birth_date, email, password, role) VALUES ('David','Wilson','1988-11-12','user5@yandex.ru', '{bcrypt}$2a$12$5ysz1nuPl43AHWEMMfKBJORXiuAdzARvNz7uM5dO8PTVq2ZBsz4nK','USER');
+            INSERT INTO users (name, surname, birth_date, email, password, role) VALUES ('Robert','Miller','1987-04-18','user6@yandex.ru', '{bcrypt}$2a$12$9XkDpLmRQWz4hYVq5n8T3.7fZ.LQKwgVOw7MqkCACNavjVS1EDnhm','USER');
+            INSERT INTO users (name, surname, birth_date, email, password, role) VALUES ('Jennifer','Taylor','1993-09-05','user7@yandex.ru', '{bcrypt}$2a$12$3boxdm0hOAuJBWGgHAdV/M8P3uoDWfGEdIeZIEXYsjUM8fb4lu6','USER');
+            INSERT INTO users (name, surname, birth_date, email, password, role) VALUES ('Thomas','Anderson','1989-06-14','user8@yandex.ru', '{bcrypt}$2a$12$CC/Z5DivekeRZDfSgO5RyM5G.yrt6JiyjARvNz7uM5dO8PTVq2ZB','USER');
+            INSERT INTO users (name, surname, birth_date, email, password, role) VALUES ('Lisa','Martinez','1995-02-28','user9@yandex.ru', '{bcrypt}$2a$12$SWnLO3hd4uO7XAe3DJgaBT6Q/e.MEN2If/3579FHueOhSU8HQVPb','USER');
+            INSERT INTO users (name, surname, birth_date, email, password, role) VALUES ('James','Robinson','1986-10-08','user10@yandex.ru', '{bcrypt}$2a$12$1It7XIoWZIEXYsjUM8fb4Liz1SDn1nuPl43AHWEMMfKBJORXiuA','USER');
+            INSERT INTO users (name, surname, birth_date, email, password, role) VALUES ('Patricia','Clark','1996-01-17','user11@yandex.ru', '{bcrypt}$2a$12$GEdIe3boxdm0hOAuJBWGgHAdV/M/eZntaWFY07JjjRYdK8P3uoDW','USER');
+            INSERT INTO users (name, surname, birth_date, email, password, role) VALUES ('Daniel','Rodriguez','1984-12-03','user12@yandex.ru', '{bcrypt}$2a$12$JiyjCC/Z5DivekeRZDfSgO5RyM1gw.gbr.s4VT92j6bpkO5G.yrt','USER');
+            INSERT INTO users (name, surname, birth_date, email, password, role) VALUES ('Nancy','Lewis','1997-07-19','user13@yandex.ru', '{bcrypt}$2a$12$MEN2If/3579FHueOhSU8HQVPboSWnLO3hd4uO7XAe3DJgaBT6Q/e','USER');
+            INSERT INTO users (name, surname, birth_date, email, password, role) VALUES ('Matthew','Walker','1983-04-26','user14@yandex.ru', '{bcrypt}$2a$12$YVq5n8T3.7fZ.LQKwgVOw7MqkCACNavjVS1EDnhmvIzEtbZ5vxztn','USER');
+            INSERT INTO users (name, surname, birth_date, email, password, role) VALUES ('Karen','Hall','1998-08-11','user15@yandex.ru', '{bcrypt}$2a$12$WGgHAdV/M/eZntaWFY07JjjRYdK8P3uoDWfGEdIe3boxdm0hOAuJ','USER');
+            INSERT INTO users (name, surname, birth_date, email, password, role) VALUES ('Christopher','Allen','1982-05-22','user16@yandex.ru', '{bcrypt}$2a$12$SgO5RyM1gw.gbr.s4VT92j6bpkO5G.yrt6JiyjCC/Z5DivekeRZD','USER');
+            INSERT INTO users (name, surname, birth_date, email, password, role) VALUES ('Betty','Young','1999-11-30','user17@yandex.ru', '{bcrypt}$2a$12$DJgaBT6Q/e.MEN2If/3579FHueOhSU8HQVPboSWnLO3hd4uO7XA','USER');
+            INSERT INTO users (name, surname, birth_date, email, password, role) VALUES ('Anthony','King','1981-03-15','user18@yandex.ru', '{bcrypt}$2a$12$bZ5vxztnGnu0Pux3.7fZ.LQKwgVOw7MqkCACNavjVS1EDnhmvIzE','USER');
+            INSERT INTO users (name, surname, birth_date, email, password, role) VALUES ('Margaret','Wright','2000-02-14','user19@yandex.ru', '{bcrypt}$2a$12$hOAuJBWGgHAdV/M/eZntaWFY07JjjRYdK8P3uoDWfGEdIe3boxdm','USER');
+            INSERT INTO users (name, surname, birth_date, email, password, role) VALUES ('Steven','Scott','1980-09-09','user20@yandex.ru', '{bcrypt}$2a$12$keRZDfSgO5RyM1gw.gbr.s4VT92j6bpkO5G.yrt6JiyjCC/Z5Dive','USER');
+            INSERT INTO users (name, surname, birth_date, email, password, role) VALUES ('Sarah','Davis','1991-07-25','admin1@yandex.ru', '{bcrypt}$2a$12$OhSU8HQVPboSWnLO3hd4uO7XAe3DJgaBT6Q/e.MEN2If/3579FHue','ADMIN');<!-- admin1 -->
+        </sql>
+    </changeSet>
+
+</databaseChangeLog>
