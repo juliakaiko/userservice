@@ -7,22 +7,22 @@ import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.io.Serializable;
 import java.time.LocalDate;
 
-@Getter
+/*@Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@EqualsAndHashCode (exclude = {"userId"})
-@ToString (exclude = {"userId"})
+@EqualsAndHashCode //(exclude = {"userId"})
+@ToString //(exclude = {"userId"})*/
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 @Builder
 public class CardInfoDto implements Serializable {
 

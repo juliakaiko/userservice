@@ -12,6 +12,9 @@
         <createIndex indexName="idx_users_surname" tableName="users">
             <column name="surname"/>
         </createIndex>
+        <rollback>
+            <dropIndex indexName="idx_users_surname" tableName="users"/>
+        </rollback>
     </changeSet>
 
 </databaseChangeLog>

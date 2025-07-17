@@ -12,6 +12,9 @@
         <createIndex indexName="idx_cards_holder" tableName="card_info">
             <column name="holder"/>
         </createIndex>
+        <rollback>
+            <dropIndex indexName="idx_cards_holder" tableName="card_info"/>
+        </rollback>
     </changeSet>
 
 </databaseChangeLog>

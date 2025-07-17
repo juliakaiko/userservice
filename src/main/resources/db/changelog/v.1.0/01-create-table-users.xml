@@ -38,6 +38,9 @@
                 <constraints nullable="false"/>
             </column>
         </createTable>
+        <rollback>
+            <dropTable tableName="users"/>
+        </rollback>
     </changeSet>
 
 </databaseChangeLog>

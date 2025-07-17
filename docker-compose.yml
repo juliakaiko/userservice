@@ -11,20 +11,17 @@ services:
       redis:
         condition: service_healthy # Ждем, пока redis не станет healthy
     environment:
-      #- DB_HOST=postgres
-      #- DB_USER=postgres
-      #- DB_PASSWORD=Kaiko1994Ulia
       - DB_HOST=postgres
       - DB_PORT=5432
       - DB_NAME=userserviceDB
       - DB_USER=postgres
       - DB_PASSWORD=Kaiko1994Ulia
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/userserviceDB
-      - SPRING_DATASOURCE_USERNAME=postgres
-      - SPRING_DATASOURCE_PASSWORD=Kaiko1994Ulia
+      #- SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/userserviceDB
+      #- SPRING_DATASOURCE_USERNAME=postgres
+      #- SPRING_DATASOURCE_PASSWORD=Kaiko1994Ulia
       - REDIS_HOST=redis
-      - SPRING_DATA_REDIS_USERNAME=default
-      - SPRING_DATA_REDIS_PASSWORD=12345
+      #- SPRING_DATA_REDIS_USERNAME=default
+      #- SPRING_DATA_REDIS_PASSWORD=12345
     networks:
       - myproject-network
 
@@ -48,18 +45,19 @@ services:
 
   redis:
     image: redis:7
+    command: redis-server --save 60 1 --loglevel warning # Простая команда без пароля
     #command: redis-server --requirepass redis # Запускает Redis с паролем "redis"
-    command: --requirepass 12345
     ports:
       - "6379:6379"
-    environment:
-      - REDIS_USERNAME=default
-      - REDIS_PASSWORD=12345
+    #environment:
+    #  - REDIS_USERNAME=default
+    #  - REDIS_PASSWORD=12345
     healthcheck:
-      test: [ "CMD", "redis-cli", "-a", "12345", "ping" ]
-      interval: 5s
-      timeout: 5s
-      retries: 5
+      test: ["CMD", "redis-cli", "ping"]  # Без пароля
+      #test: [ "CMD", "redis-cli", "-a", "12345", "ping" ]
+      #interval: 5s
+      #timeout: 5s
+      #retries: 5
     networks:
       - myproject-network
 

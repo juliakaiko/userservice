@@ -35,6 +35,9 @@
             INSERT INTO card_info (number, holder, expiration_date, user_id) VALUES ('4888999900001111', 'Anthony King', '2026-05-31', 18);
             INSERT INTO card_info (number, holder, expiration_date, user_id) VALUES ('4999000011112222', 'Margaret Wright', '2024-07-31', 19);
         </sql>
+        <rollback>
+            DELETE FROM card_info WHERE id IN (1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21);
+        </rollback>
     </changeSet>
 
 </databaseChangeLog>

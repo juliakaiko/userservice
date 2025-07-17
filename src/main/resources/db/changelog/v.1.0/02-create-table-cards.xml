@@ -35,6 +35,9 @@
         <addForeignKeyConstraint constraintName="fk_user_card"
                                  baseTableName="card_info" baseColumnNames="user_id"
                                  referencedTableName="users" referencedColumnNames="id" />
+        <rollback>
+            <dropTable tableName="card_info"/>
+        </rollback>
     </changeSet>
 
 </databaseChangeLog>

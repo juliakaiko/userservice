@@ -36,6 +36,20 @@
             INSERT INTO users (name, surname, birth_date, email, password, role) VALUES ('Steven','Scott','1980-09-09','user20@yandex.ru', '{bcrypt}$2a$12$keRZDfSgO5RyM1gw.gbr.s4VT92j6bpkO5G.yrt6JiyjCC/Z5Dive','USER');
             INSERT INTO users (name, surname, birth_date, email, password, role) VALUES ('Sarah','Davis','1991-07-25','admin1@yandex.ru', '{bcrypt}$2a$12$OhSU8HQVPboSWnLO3hd4uO7XAe3DJgaBT6Q/e.MEN2If/3579FHue','ADMIN');<!-- admin1 -->
         </sql>
+        <!--<rollback>
+            DELETE FROM users WHERE email IN (
+            'user1@yandex.ru', 'user2@yandex.ru', 'user3@yandex.ru',
+            'user4@yandex.ru', 'user5@yandex.ru', 'user6@yandex.ru',
+            'user7@yandex.ru', 'user8@yandex.ru', 'user9@yandex.ru',
+            'user10@yandex.ru', 'user11@yandex.ru', 'user12@yandex.ru',
+            'user13@yandex.ru', 'user14@yandex.ru', 'user15@yandex.ru',
+            'user16@yandex.ru', 'user17@yandex.ru', 'user18@yandex.ru',
+            'user19@yandex.ru', 'user20@yandex.ru', 'admin1@yandex.ru'
+            );
+        </rollback>-->
+        <rollback>
+            DELETE FROM users WHERE id IN (1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21);
+        </rollback>
     </changeSet>
 
 </databaseChangeLog>
