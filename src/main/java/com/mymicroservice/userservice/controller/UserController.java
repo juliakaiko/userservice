@@ -41,15 +41,14 @@ public class UserController {
     @GetMapping("/{id}")
     public ResponseEntity<?> getUserById (@PathVariable("id") Long id) {
         log.info("Request to find the User by id: {}",id);
-        UserDto userDto = userService.getUsersById(id);
+        UserDto userDto = userService.getUserById(id);
         return ObjectUtils.isEmpty(userDto)
                 ? ResponseEntity.notFound().build()
                 : ResponseEntity.ok(userDto);
     }
 
-    @GetMapping("/find-by-email")
-    //http://localhost:8080/api/users/find-by-email?email=user1%40yandex.ru
-    public ResponseEntity<?> getUserByEmail (@RequestParam String email) {  //@RequestParam извлекает значения из строки запроса,строка запроса начинается ?
+    @GetMapping("/find-by-email") //http://localhost:8080/api/users/find-by-email?email=user1%40yandex.ru
+    public ResponseEntity<?> getUserByEmail (@RequestParam String email) {
         log.info("Request to find the User by email: {}",email);
         UserDto userDto = userService.getUsersByEmail(email);
         return ObjectUtils.isEmpty(userDto)
@@ -72,7 +71,7 @@ public class UserController {
     }
 
     @GetMapping("/born-after") // /born-after?date=1990-01-01
-    public ResponseEntity<List<UserDto>> getUsersBornAfter( @RequestParam LocalDate date) {
+    public ResponseEntity<List<UserDto>> getUsersBornAfter(@RequestParam LocalDate date) {
         log.info("Request to find Users born after: {}", date);
         List<UserDto> userDtos = userService.getUsersBornAfter(date);
         log.debug("Found {} users born after {}", userDtos.size(), date);
@@ -85,8 +84,7 @@ public class UserController {
         return ResponseEntity.ok(userService.getAllUsers());
     }
 
-    @GetMapping("/paginated")
-    //http://localhost:8080/api/users/paginated?page=0&size=2
+    @GetMapping("/paginated") //http://localhost:8080/api/users/paginated?page=0&size=2
     public ResponseEntity<Page<UserDto>> getAllUsersWithPagination(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {

@@ -1,17 +1,17 @@
-# Используем официальный образ Tomcat с Java 21
+# Use the official Tomcat image with Java 21
 FROM tomcat:10.1-jdk21-temurin
 
-# Удаляем дефолтные приложения (опционально)
+# Remove default Tomcat apps
 RUN rm -rf /usr/local/tomcat/webapps/*
 
-# Установить redis-tools
+# Install redis-tools for Redis CLI support
 RUN apt-get update && apt-get install -y redis-tools
 
-# Копируем WAR-файл в контейнер (переименовываем в ROOT.war для доступа по корневому URL)
+# Copy the WAR file into the container (renamed to ROOT.war for root URL access)
 COPY target/userservice-0.0.1-SNAPSHOT.war /usr/local/tomcat/webapps/ROOT.war
 
-# Открываем порт Tomcat
+# Expose Tomcat's default port
 EXPOSE 8080
 
-# Запускаем Tomcat
+# Start Tomcat
 CMD ["catalina.sh", "run"]

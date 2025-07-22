@@ -23,13 +23,13 @@ public interface CardInfoMapper {
     CardInfoDto toDto(CardInfo cardInfo);
 
     /**
-     * Конвертирует {@link CardInfoDto} обратно в сущность {@link CardInfo}.
+     * Converts {@link CardInfoDto} back to {@link CardInfo} entity.
      * <p>
-     * Реализует <b>обратное преобразование</b> относительно маппинга {@code CardInfo -> CardInfoDto}.
+     * Implements <b>reverse mapping</b> relative to {@code CardInfo -> CardInfoDto} conversion.
      * </p>
      *
-     * @param cardInfoDto DTO-объект для преобразования (не может быть {@code null})
-     * @return соответствующая сущность {@link CardInfo}
+     * @param cardInfoDto DTO object to convert (cannot be {@code null})
+     * @return corresponding {@link CardInfo} entity
      */
     @InheritInverseConfiguration
     CardInfo toEntity (@NonNull CardInfoDto cardInfoDto);

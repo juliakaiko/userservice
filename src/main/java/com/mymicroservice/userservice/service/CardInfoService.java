@@ -1,7 +1,6 @@
 package com.mymicroservice.userservice.service;
 
 import com.mymicroservice.userservice.dto.CardInfoDto;
-import com.mymicroservice.userservice.model.CardInfo;
 import org.springframework.data.domain.Page;
 
 import java.util.List;

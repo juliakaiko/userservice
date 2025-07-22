@@ -11,7 +11,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.cache.RedisCacheConfiguration;
 import org.springframework.data.redis.cache.RedisCacheManager;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
-import org.springframework.data.redis.connection.RedisPassword;
 import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -23,7 +22,7 @@ import java.time.Duration;
 import org.slf4j.Logger;
 
 @Configuration
-@EnableCaching // Включить кэширование. Ищет @Cacheable, @CachePut, @CacheEvict и будет кэшировать их результаты
+@EnableCaching
 public class RedisConfig {
 
     private static final Logger logger = LoggerFactory.getLogger(RedisConfig.class);
@@ -34,17 +33,9 @@ public class RedisConfig {
     @Value("${spring.data.redis.port}")
     private int redisPort;
 
-   /* @Value("${spring.data.redis.password}")
-    private String password;
-
-    @Value("${spring.data.redis.username}")
-    private String redisUsername;
-*/
-
     @Bean
     public RedisConnectionFactory redisConnectionFactory() {
-        /* logger.info("Redis Config - Host: {}, Port: {}, Username: {}, Password: {}",
-                redisHost, redisPort, redisUsername, password);*/
+         logger.info("Redis Config - Host: {}, Port: {}", redisHost, redisPort);
         return createLettuceConnectionFactory();
     }
 
@@ -52,27 +43,38 @@ public class RedisConfig {
         RedisStandaloneConfiguration config = new RedisStandaloneConfiguration();
         config.setHostName(redisHost);
         config.setPort(redisPort);
-        //config.setUsername(redisUsername);
-       // config.setPassword(RedisPassword.of(password));
         return new LettuceConnectionFactory(config);
     }
 
-
+    /**
+     * Creates and configures a {@link RedisCacheManager} bean for declarative caching using annotations.
+     * This cache manager uses Redis as the underlying cache store with JSON serialization.
+     *
+     * <p>Key features:
+     * <ul>
+     *     <li>Uses Jackson-based JSON serialization for cache values.</li>
+     *     <li>Sets a default Time-To-Live (TTL) of 15 minutes for all cache entries.</li>
+     *     <li>Prevents caching of {@code null} values to avoid cache pollution.</li>
+     *     <li>Configures a customized {@link ObjectMapper} for consistent JSON handling.</li>
+     * </ul>
+     *
+     * @param connectionFactory the {@link RedisConnectionFactory} used to establish Redis connections
+     * @return a fully configured {@link RedisCacheManager} instance
+     * @see org.springframework.cache.annotation.EnableCaching
+     * @see org.springframework.data.redis.cache.RedisCacheConfiguration
+     *
+     * @implNote The cache manager uses {@link GenericJackson2JsonRedisSerializer} for value serialization,
+     *           which stores type information in the JSON payload for proper deserialization.
+     *           The default TTL (15 minutes) can be overridden per-cache via {@code @Cacheable} annotations.
+     */
     @Bean
-    public RedisCacheManager cacheManager(RedisConnectionFactory connectionFactory) {
+    public RedisCacheManager cacheManager(RedisConnectionFactory connectionFactory) { //for declarative caching (via annotations)
         ObjectMapper objectMapper = createConfiguredObjectMapper();
-
-        // Включаем информацию о типе для корректной десериализации
-        objectMapper.activateDefaultTyping( // !!! Чтобы Jackson сохранял информацию о Dto при сериализации.
-                objectMapper.getPolymorphicTypeValidator(),
-                ObjectMapper.DefaultTyping.NON_FINAL//EVERYTHING,
-                //JsonTypeInfo.As.PROPERTY
-        );
 
         GenericJackson2JsonRedisSerializer serializer = new GenericJackson2JsonRedisSerializer(objectMapper);
 
         RedisCacheConfiguration cacheConfig = RedisCacheConfiguration.defaultCacheConfig()
-                .entryTtl(Duration.ofMinutes(60))
+                .entryTtl(Duration.ofMinutes(15))
                 .disableCachingNullValues()
                 .serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(serializer));
 
@@ -82,65 +84,47 @@ public class RedisConfig {
     }
 
     @Bean
-    public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory connectionFactory) {
+    public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory connectionFactory) { //for programmatic work with Redis
         RedisTemplate<String, Object> template = new RedisTemplate<>();
         template.setConnectionFactory(connectionFactory);
         template.setKeySerializer(new StringRedisSerializer());
 
-        // Используем тот же ObjectMapper, что и в cacheManager
         ObjectMapper objectMapper = createConfiguredObjectMapper();
-        objectMapper.activateDefaultTyping( // !!! Чтобы Jackson сохранял информацию о Dto при сериализации.
-                objectMapper.getPolymorphicTypeValidator(),
-                ObjectMapper.DefaultTyping.NON_FINAL//EVERYTHING,
-                //JsonTypeInfo.As.PROPERTY
-        );
+
         template.setValueSerializer(new GenericJackson2JsonRedisSerializer(objectMapper));
 
         return template;
     }
 
-    //  Для серелизации в JSON LocalDate создаём ObjectMapper и регистрируем модуль JavaTimeModule
-    // Jackson по умолчанию не поддерживает сериализацию типов Java 8 Date/Time
+    /**
+     * Creates a preconfigured {@link ObjectMapper} for Redis JSON serialization.
+     * <p>Features:
+     * <ul>
+     *     <li>Supports Java 8 Date/Time via {@link JavaTimeModule}</li>
+     *     <li>Ignores unknown JSON properties</li>
+     *     <li>Preserves type info for polymorphic DTOs</li>
+     * </ul>
+     * <p>
+     *  Enables a mechanism that adds class metadata to JSON (as an {@code @class} field),
+     *  allowing proper deserialization of objects back to their original type.
+     *  <p>
+     *  Solves the {@code ClassCastException} issue where Jackson by default
+     *  deserializes complex objects into {@code LinkedHashMap} instead of the target DTO class.
+     *  <p>
+     *  Example of the problem this solves:
+     *  {@code java.lang.ClassCastException: java.util.LinkedHashMap cannot be cast
+     *  to com.mymicroservice.userservice.dto.UserDto}
+     *
+     * @return configured ObjectMapper instance
+     */
     private ObjectMapper createConfiguredObjectMapper() {
         ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.registerModule(new JavaTimeModule()); // Для поддержки LocalDate
+        objectMapper.registerModule(new JavaTimeModule()); // serialization in JSON LocalDate.
         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        objectMapper.activateDefaultTyping( // helps deserialization to Dto
+                objectMapper.getPolymorphicTypeValidator(),
+                ObjectMapper.DefaultTyping.NON_FINAL //no adding data about !!!type of non-final classes (String, Integer, int)
+        );
         return objectMapper;
     }
-
-
-/*
-    @Bean
-    public RedisConnectionFactory redisConnectionFactory() {
-        logger.info("Redis Config - Host: {}, Port: {}, Username: {}, Password: {}",
-                redisHost, redisPort, redisUsername, password);
-        RedisStandaloneConfiguration config = new RedisStandaloneConfiguration();
-        config.setHostName(redisHost);
-        config.setPort(redisPort);
-        //config.setUsername(null); // Явно отключаем имя пользователя (не подключался Redis)
-        config.setUsername(redisUsername); // Имя пользователя
-        config.setPassword(RedisPassword.of(password));
-        return new LettuceConnectionFactory(config);
-    }
-
-    @Bean
-    public RedisCacheManager cacheManager(RedisConnectionFactory connectionFactory) {
-        //  Для серелизации в JSON LocalDate создаём ObjectMapper и регистрируем модуль JavaTimeModule
-        //Jackson по умолчанию не поддерживает сериализацию типов Java 8 Date/Time
-        ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.registerModule(new JavaTimeModule());
-
-        // Настраиваем сериализатор с поддержкой Java 8 Date/Time
-        GenericJackson2JsonRedisSerializer serializer = new GenericJackson2JsonRedisSerializer(objectMapper);
-
-        RedisCacheConfiguration cacheConfig = RedisCacheConfiguration.defaultCacheConfig()
-                .entryTtl(Duration.ofMinutes(60)) // Время жизни кэша - 60 минут
-                .disableCachingNullValues() // Не кэшировать null значения
-                .serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(serializer));
-
-        return RedisCacheManager.builder(connectionFactory)
-                .cacheDefaults(cacheConfig)
-                .build();
-    }*/
-
 }

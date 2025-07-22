@@ -14,12 +14,6 @@ import org.springframework.format.annotation.DateTimeFormat;
 import java.io.Serializable;
 import java.time.LocalDate;
 
-/*@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-@EqualsAndHashCode //(exclude = {"userId"})
-@ToString //(exclude = {"userId"})*/
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -41,15 +35,15 @@ public class CardInfoDto implements Serializable {
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     private LocalDate expirationDate;
 
-/*    @JsonIgnore
-    private User user;*/
-
-  // @JsonProperty("userId")
+    /**
+     * Unique identifier of the User associated with the CardInfo.
+     * <p>
+     * Participates in serialization (object to JSON conversion) and deserialization
+     * (JSON to object conversion) under the name {@code "userId"}.
+     * <p>
+     * When mapping ({@code Mapping}), the ID of the associated User is used.
+     */
+    @JsonProperty("userId")
     private Long userId;
 
-    @JsonProperty("userId") //поле должно участвовать в сериализации/десериализации
-    public Long getUserId() {
-        return userId; // в Mapping берем ID связанного User
-        //return user != null ? user.getUserId() : userId;
-    }
 }

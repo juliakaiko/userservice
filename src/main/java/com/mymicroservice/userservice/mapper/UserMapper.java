@@ -23,13 +23,13 @@ public interface UserMapper {
     UserDto toDto(User user);
 
     /**
-     * Конвертирует {@link UserDto} обратно в сущность {@link UserDto}.
+     * Converts {@link UserDto} back to {@link User} entity.
      * <p>
-     * Реализует <b>обратное преобразование</b> относительно маппинга {@code UserDto -> UserDto}.
+     * Implements <b>reverse mapping</b> relative to {@code User -> UserDto} conversion.
      * </p>
      *
-     * @param userDto DTO-объект для преобразования (не может быть {@code null})
-     * @return соответствующая сущность {@link User}
+     * @param userDto DTO object to convert (cannot be {@code null})
+     * @return corresponding {@link User} entity
      */
     @InheritInverseConfiguration
     User toEntity (@NonNull UserDto userDto);

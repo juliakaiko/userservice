@@ -36,18 +36,30 @@ public class CardInfoController {
 
     private final CardInfoService cardInfoService;
 
+    /**
+     * Retrieves card information by its ID.
+     *
+     * <p>This endpoint handles a GET request to fetch CardInfo based on the provided ID.
+     * If no CardInfo information is found for the given ID, a 404 Not Found response is returned.</p>
+     *
+     * @param id The ID of the CardInfo to retrieve (path variable)
+     * @return ResponseEntity containing the CardInfoDto if found (status 200),
+     *         or an empty response with status 404 if not found
+     * @apiNote Uses ObjectUtils.isEmpty() to check if the returned DTO is null or empty
+     *          (including cases like empty string, empty collection, etc.)
+     * @see org.springframework.util.ObjectUtils#isEmpty(Object)
+     */
     @GetMapping("/{id}")
     public ResponseEntity<?> getCardInfoById (@PathVariable("id") Long id) {
         log.info("Request to find the CardInfo by id: {}",id);
         CardInfoDto cardInfoDto = cardInfoService.getCardInfoById(id);
-        return ObjectUtils.isEmpty(cardInfoDto) //возвращает true, если объект null или пустой (например, пустая строка, пустая коллекция и т.д.)
+        return ObjectUtils.isEmpty(cardInfoDto)
                 ? ResponseEntity.notFound().build()
                 : ResponseEntity.ok(cardInfoDto);
     }
 
-    @GetMapping("/find-by-number")
-    //http://localhost:8080/api/cards/find_by_number?number=4111111111119999
-    public ResponseEntity<?> getCardInfoByNumber (@RequestParam String number) {  //@RequestParam извлекает значения из строки запроса,строка запроса начинается ?
+    @GetMapping("/find-by-number") //http://localhost:8080/api/cards/find_by_number?number=4111111111119999
+    public ResponseEntity<?> getCardInfoByNumber (@RequestParam String number) {
         log.info("Request to find the CardInfo by number: {}",number);
         CardInfoDto cardInfoDto = cardInfoService.getCardInfoByNumber(number);
         return ObjectUtils.isEmpty(cardInfoDto)
@@ -61,7 +73,7 @@ public class CardInfoController {
         return ResponseEntity.ok(cardInfoService.getCardInfoIdIn(ids));
     }
 
-    @GetMapping("/user/{user_id}") // user/1
+    @GetMapping("/user/{user_id}")
     public ResponseEntity<List<CardInfoDto>> getCardInfoByUserId(@PathVariable("user_id") Long user_id) {
         log.info("Request to find CardInfos by userId: {}", user_id);
         return ResponseEntity.ok(cardInfoService.getByUserId(user_id));
@@ -79,8 +91,7 @@ public class CardInfoController {
         return ResponseEntity.ok(cardInfoService.getAllCardInfos());
     }
 
-    @GetMapping("/paginated")
-    //http://localhost:8080/api/cards/paginated?page=0&size=2
+    @GetMapping("/paginated") //http://localhost:8080/api/cards/paginated?page=0&size=2
     public ResponseEntity<Page<CardInfoDto>> getAllCardInfosWithPagination(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {

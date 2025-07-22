@@ -1,7 +1,7 @@
 package com.mymicroservice.userservice.service.impl;
 
 import com.mymicroservice.userservice.dto.UserDto;
-import com.mymicroservice.userservice.exception.NotFoundException;
+import com.mymicroservice.userservice.exception.UserNotFoundException;
 import com.mymicroservice.userservice.mapper.UserMapper;
 import com.mymicroservice.userservice.model.Role;
 import com.mymicroservice.userservice.model.User;
@@ -27,16 +27,16 @@ import java.util.Set;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-@CacheConfig(cacheNames = "usersCache")
+@CacheConfig(cacheNames = "userCache")
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
 
     /**
-     * Создает нового пользователя на основе переданного DTO.
+     * Creates a new User based on the provided DTO.
      *
-     * @param userDto DTO с данными пользователя.
-     * @return DTO созданного пользователя.
+     * @param userDto DTO containing user data.
+     * @return DTO of the created user.
      */
     @Override
     @Transactional
@@ -48,32 +48,32 @@ public class UserServiceImpl implements UserService {
     }
 
     /**
-     * Возвращает пользователя по его ID. Результат кэшируется в "userCache" с ключом по userId.
-     * При последующих запросах с тем же ID будет возвращаться значение из кэша, минуя базу данных.
+     * Returns the User by its ID. The result is cached in "userCache" with the userId as the key.
+     * Subsequent requests with the same ID will return the value from the cache, bypassing the database.
      *
-     * @param userId ID пользователя для поиска
-     * @return DTO найденного пользователя
-     * @throws NotFoundException если пользователь с указанным ID не найден в базе данных
+     * @param userId ID of the user to find
+     * @return DTO of the found user
+     * @throws UserNotFoundException if the User with the specified ID is not found in the database
      * @see org.springframework.cache.annotation.Cacheable
      */
     @Override
     @Transactional(readOnly = true)
     @Cacheable(value = "userCache", key = "#userId")
-    public UserDto getUsersById(Long userId) {
+    public UserDto getUserById(Long userId) {
         Optional<User> user = Optional.ofNullable(userRepository.findById(userId)
-                .orElseThrow(() -> new NotFoundException("User wasn't found with id " + userId)));
+                .orElseThrow(() -> new UserNotFoundException("User wasn't found with id " + userId)));
         log.info("getUsersById(): {}",userId);
         return UserMapper.INSTANSE.toDto(user.get());
     }
 
     /**
-     * Обновляет данные пользователя (name, surname, birthDate, email, пароль и роль)
-     * и обновляет соответствующую запись в кэше "userCache" с ключом по userId.
+     * Updates User data (name, surname, birthDate, email, password and role)
+     * and updates the corresponding data in the "userCache" with the userId as the key.
      *
-     * @param userId ID пользователя для обновления
-     * @param userDetails DTO с обновлёнными данными пользователя
-     * @return DTO обновлённого пользователя
-     * @throws NotFoundException если пользователь с указанным ID не найден в базе данных
+     * @param userId ID of the User to update
+     * @param userDetails DTO containing updated User data
+     * @return DTO of the updated User
+     * @throws UserNotFoundException if the User with the specified ID is not found in the database
      * @see org.springframework.cache.annotation.CachePut
      */
     @Override
@@ -81,7 +81,7 @@ public class UserServiceImpl implements UserService {
     @CachePut(value = "userCache", key = "#userId") // update in cache
     public UserDto updateUser(Long userId, UserDto userDetails) {
         Optional<User> userFromDb = Optional.ofNullable(userRepository.findById(userId)
-                .orElseThrow(() -> new NotFoundException("User wasn't found with id " + userId)));
+                .orElseThrow(() -> new UserNotFoundException("User wasn't found with id " + userId)));
         User user = userFromDb.get();
         user.setName(userDetails.getName());
         user.setSurname(userDetails.getSurname());
@@ -95,11 +95,11 @@ public class UserServiceImpl implements UserService {
     }
 
     /**
-     * Удаляет пользователя по его ID и удаляет соответствующую запись из кэша "userCache".
+     * Deletes the User by their ID and removes the corresponding data from the "userCache".
      *
-     * @param userId ID пользователя для удаления
-     * @return DTO удалённого пользователя
-     * @throws NotFoundException если пользователь с указанным ID не найден в базе данных
+     * @param userId ID of the User to delete
+     * @return DTO of the deleted User
+     * @throws UserNotFoundException if the User with the specified ID is not found in the database
      * @see org.springframework.cache.annotation.CacheEvict
      */
     @Override
@@ -107,33 +107,33 @@ public class UserServiceImpl implements UserService {
     @CacheEvict(value = "userCache", key = "#userId") // delete from cache
     public UserDto deleteUser(Long userId) {
         Optional<User> user = Optional.ofNullable(userRepository.findById(userId)
-                .orElseThrow(() -> new NotFoundException("User wasn't found with id " + userId)));
+                .orElseThrow(() -> new UserNotFoundException("User wasn't found with id " + userId)));
         userRepository.deleteById(userId);
         log.info("deleteUser(): {}",user);
         return UserMapper.INSTANSE.toDto(user.get());
     }
 
     /**
-     * Возвращает пользователя по его email.
+     * Returns the User by their email.
      *
-     * @param email email пользователя.
-     * @return DTO найденного пользователя.
-     * @throws NotFoundException если пользователь с указанным email не найден.
+     * @param email email of the user to find
+     * @return DTO of the found User
+     * @throws UserNotFoundException if the User with the specified email is not found
      */
     @Override
     @Transactional(readOnly = true)
     public UserDto getUsersByEmail(String email) {
         Optional<User> user = Optional.ofNullable(userRepository.findByEmailIgnoreCase(email)
-                .orElseThrow(() -> new NotFoundException("User wasn't found with email " + email)));
+                .orElseThrow(() -> new UserNotFoundException("User wasn't found with email " + email)));
         log.info("getUsersByEmail(): {}",user);
         return UserMapper.INSTANSE.toDto(user.get());
     }
 
     /**
-     *Возвращает список пользователей по заданному набору идентификаторов.
+     * Returns a list of Users by the specified set of IDs.
      *
-     * @param ids Набор идентификаторов пользователей для поиска
-     * @return Список DTO пользователей с указанными идентификаторами
+     * @param ids Set of User IDs to search for
+     * @return List of UserDtos with the specified IDs
      */
     @Override
     @Transactional(readOnly = true)
@@ -144,10 +144,10 @@ public class UserServiceImpl implements UserService {
     }
 
     /**
-     * Возвращает список пользователей по ролям.
+     * Returns a list of Users by role.
      *
-     * @param role role пользователя.
-     * @return Список DTO пользователей с указанной ролью.
+     * @param role User role to filter by
+     * @return List of UserDtos with the specified role
      */
     @Override
     @Transactional(readOnly = true)
@@ -158,10 +158,10 @@ public class UserServiceImpl implements UserService {
     }
 
     /**
-     * Возвращает список пользователей, рожденных после указанной даты.
+     * Returns a list of Users born after the specified date.
      *
-     * @param date Дата рождения в формате строки
-     * @return Список DTO пользователей, чья дата рождения строго позже указанной даты
+     * @param date birth date in LocalDate format
+     * @return List of UserDtos with birth dates strictly after the specified date
      */
     @Override
     @Transactional(readOnly = true)
@@ -172,9 +172,9 @@ public class UserServiceImpl implements UserService {
     }
 
     /**
-     * Возвращает список всех пользователей.
+     * Returns a list of all Users.
      *
-     * @return Список DTO всех пользователей.
+     * @return List of all UserDtos
      */
     @Override
     @Transactional(readOnly = true)
@@ -185,11 +185,11 @@ public class UserServiceImpl implements UserService {
     }
 
     /**
-     * Возвращает страницу с пользователями, используя нативную пагинацию и сортировку по ID.
+     * Returns a page of Users using native pagination sorted by ID.
      *
-     * @param page Номер страницы (начиная с 0).
-     * @param size Количество пользователей на странице.
-     * @return Страница с DTO пользователей.
+     * @param page Page number (0-based index)
+     * @param size Number of Users per page
+     * @return Page of user DTOs
      */
     @Override
     @Transactional(readOnly = true)

@@ -11,7 +11,7 @@ import java.util.Set;
 public interface UserService {
 
     UserDto createUser(UserDto userDto);
-    UserDto getUsersById(Long userId);
+    UserDto getUserById(Long userId);
     UserDto getUsersByEmail(String email);
     List<UserDto> getUsersIdIn(Set<Long> ids);
     List<UserDto> getUsersByRole(Role role);

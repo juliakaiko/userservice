@@ -1,22 +1,27 @@
 # UserService  
-Микросервис для управления пользователями и их картами, построенный на Spring Boot 3.3.4 с использованием PostgreSQL, Redis, Liquibase и OpenAPI (Swagger).  
+A microservice for managing users and their cards, built on Spring Boot 3.3.4 using PostgreSQL, Redis, Liquibase, and OpenAPI (Swagger).
 
-## 🚀 Основные возможности  
-- Управление пользователями (CRUD) и их картами.  
-- Кэширование данных с помощью Redis.  
-- Автоматическое обновление БД через Liquibase.  
-- Документирование API через Swagger UI.  
-- Поддержка Docker (сборка и развертывание).  
+## 🚀 Key Features  
+- User and card management (CRUD operations).
+- Data caching with Redis.
+- Automated database updates via Liquibase.
+- API documentation via Swagger UI.
+- Docker support (build and deployment). 
 
-## ⚙️ Технологии  
-- Java 21  
-- Spring Boot 3.3.4 (Web, Data JPA, Validation, Redis)  
-- PostgreSQL (основная БД)  
-- Liquibase (миграции)  
-- MapStruct (маппинг DTO)  
-- Lombok (уменьшение boilerplate-кода)  
-- SpringDoc OpenAPI (документация API)  
+## ⚙️ Technologies
+- Java 21
+- Spring Boot 3.3.4 (Web, Data JPA, Validation, Redis)
+- PostgreSQL (primary database)
+- Liquibase (migrations)
+- MapStruct (DTO mapping)
+- Lombok (reducing boilerplate code)
+- SpringDoc OpenAPI (API documentation)
 
-## 📩 Контакты  
-**Автор:** Юлия Кайко  
-**Email:** yuliya.kaiko@innowise.com  
+## 🧪 Testing
+- Unit Testing: JUnit 5 + Mockito for mocking dependencies. 
+- Containerized Integration Testing: Testcontainers for running PostgreSQL and Redis in Docker containers during integration tests.
+
+## 📩 Contacts
+**Author:** Yuliya Kaiko
+**Email:** yuliya.kaiko@innowise.com
+

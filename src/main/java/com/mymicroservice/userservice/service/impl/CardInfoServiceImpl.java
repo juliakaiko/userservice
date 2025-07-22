@@ -1,7 +1,8 @@
 package com.mymicroservice.userservice.service.impl;
 
 import com.mymicroservice.userservice.dto.CardInfoDto;
-import com.mymicroservice.userservice.exception.NotFoundException;
+import com.mymicroservice.userservice.exception.CardInfoNotFoundException;
+import com.mymicroservice.userservice.exception.UserNotFoundException;
 import com.mymicroservice.userservice.mapper.CardInfoMapper;
 import com.mymicroservice.userservice.model.CardInfo;
 import com.mymicroservice.userservice.model.User;
@@ -35,14 +36,14 @@ public class CardInfoServiceImpl implements CardInfoService {
     private final UserRepository userRepository;
 
     /**
-     * Создает новую банковскую карточку на основе переданного DTO.
+     * Creates a new CardInfo based on the provided DTO.
      *
-     * Если userId предоставлен, добавляет карту в список карт пользователя с указанным ID.
+     * If userId is provided, adds the CardInfo to the list of cards for the User with specified ID.
      *
-     * @param cardInfoDto DTO с данными карты. Не должен быть {@code null}.
-     * @return DTO созданной карты.
-     * @throws NotFoundException если передан userId, но пользователь с таким ID не найден
-     * @throws jakarta.validation.ConstraintViolationException если данные карты невалидны
+     * @param cardInfoDto DTO containing CardInfo data. Must not be {@code null}.
+     * @return DTO of the created CardInfo.
+     * @throws UserNotFoundException if userId is provided but no user with such ID is found
+     * @throws jakarta.validation.ConstraintViolationException if card data is invalid
      */
     @Override
     @Transactional
@@ -52,7 +53,7 @@ public class CardInfoServiceImpl implements CardInfoService {
 
         if (cardInfoDto.getUserId() != null) {
             User user = userRepository.findById(cardInfoDto.getUserId())
-                    .orElseThrow(() -> new NotFoundException("User not found with id: " + cardInfoDto.getUserId()));
+                    .orElseThrow(() -> new UserNotFoundException("User not found with id: " + cardInfoDto.getUserId()));
             cardInfo.setUserId(user);
         }
         cardInfo = cardInfoRepository.save(cardInfo);
@@ -60,35 +61,35 @@ public class CardInfoServiceImpl implements CardInfoService {
     }
 
     /**
-     * Возвращает банковскую карточку по ее ID.
+     * Returns the CardInfo by its ID.
      *
-     * Результат метода кэшируется в кэше "cardInfoCache" с использованием ID карты в качестве ключа.
-     * При повторных вызовах с тем же ID карты будет возвращаться значение из кэша без обращения к базе данных,
-     * пока кэш не станет недействительным.
+     * The method result is cached in "cardInfoCache" using the card ID as the key.
+     * Subsequent calls with the same CardInfo ID will return the value from cache without database access
      *
-     * @param cardId ID карты.
-     * @return DTO найденной карты.
-     * @throws NotFoundException если карта с указанным ID не найдена.
+     * @param cardId ID of the CardInfo
+     * @return DTO of the found CardInfo
+     * @throws CardInfoNotFoundException if no CardInfo with the specified ID is found
      */
     @Override
     @Transactional(readOnly = true)
     @Cacheable(key = "#cardId")
     public CardInfoDto getCardInfoById(Long cardId) {
         Optional<CardInfo> cardInfo = Optional.ofNullable(cardInfoRepository.findById(cardId)
-                .orElseThrow(() -> new NotFoundException("CardInfo wasn't found with id " + cardId)));
+                .orElseThrow(() -> new CardInfoNotFoundException("CardInfo wasn't found with id " + cardId)));
         log.info("getCardInfoById(): {}",cardId);
         return  CardInfoMapper.INSTANSE.toDto(cardInfo.get());
     }
 
     /**
-     * Обновляет данные карты (number, holder, expiration_date, userId) и обновляет соответствующую запись в кэше.
-     * Если карта с указанным ID не найдена, выбрасывается исключение NotFoundException.
-     * После успешного обновления обновлённые данные карты сохраняются в кэш "cardInfoCache" с ключом, равным ID карты.
+     * Updates CardInfo data (number, holder, expiration_date, userId) and updates the corresponding cache entry.
+     * If no CardInfo with the specified ID is found, throws CardInfoNotFoundException.
+     * After successful update, the updated CardInfo data is saved in "cardInfoCache" with the CardInfo ID as the key.
      *
-     * @param cardId ID карты для обновления.
-     * @param cardInfoDto DTO с обновлёнными данными карты.
-     * @return DTO обновлённой карты.
-     * @throws NotFoundException если карта с указанным ID не найдена или если пользователь с указанным ID не существует.
+     * @param cardId ID of the CardInfo to update
+     * @param cardInfoDto DTO containing updated CardInfo data
+     * @return DTO of the updated CardInfo
+     * @throws CardInfoNotFoundException if no CardInfo with the specified ID is found
+     * @throws UserNotFoundException if no User with ID cardInfoDto.getUserId() exists
      * @see org.springframework.cache.annotation.CachePut
      */
     @Override
@@ -96,12 +97,12 @@ public class CardInfoServiceImpl implements CardInfoService {
     @CachePut(key = "#cardId") // update in cache
     public CardInfoDto updateCardInfo(Long cardId, CardInfoDto cardInfoDto) {
         Optional<CardInfo> cardInfoFromDb = Optional.ofNullable(cardInfoRepository.findById(cardId)
-                .orElseThrow(() -> new NotFoundException("CardInfo wasn't found with id " + cardId)));
+                .orElseThrow(() -> new CardInfoNotFoundException("CardInfo wasn't found with id " + cardId)));
         CardInfo cardInfo = cardInfoFromDb.get();
 
         if (cardInfoDto.getUserId() != null) {
             User user = userRepository.findById(cardInfoDto.getUserId())
-                    .orElseThrow(() -> new NotFoundException("User not found with id: " + cardInfoDto.getUserId()));
+                    .orElseThrow(() -> new UserNotFoundException("User not found with id: " + cardInfoDto.getUserId()));
             cardInfo.setUserId(user);
         }
         cardInfo.setNumber(cardInfoDto.getNumber());
@@ -113,47 +114,47 @@ public class CardInfoServiceImpl implements CardInfoService {
     }
 
     /**
-     * Удаляет карту по её ID и удаляет соответствующую запись из кэша.
-     * Если карта с указанным ID не найдена, выбрасывается исключение NotFoundException.
-     * После успешного удаления запись с ключом, равным ID карты, удаляется из кэша "cardInfoCache".
+     * Deletes the CardInfo by its ID and removes the corresponding cache entry.
+     * Throws CardInfoNotFoundException if no CardInfo with the specified ID is found.
+     * After successful deletion, the entry with the card ID as key is removed from "cardInfoCache".
      *
-     * @param cardId ID карты для удаления.
-     * @return DTO удалённой карты.
-     * @throws NotFoundException если карта с указанным ID не найдена.
+     * @param cardId ID of the CardInfo to delete
+     * @return DTO of the deleted CardInfo
+     * @throws CardInfoNotFoundException if no CardInfo with the specified ID is found
      * @see org.springframework.cache.annotation.CacheEvict
      */
     @Override
     @Transactional
-    @CacheEvict(key = "#cardId") // delete from cache
+    @CacheEvict(key = "#cardId")
     public CardInfoDto deleteCardInfo(Long cardId) {
         Optional<CardInfo> cardInfo = Optional.ofNullable(cardInfoRepository.findById(cardId)
-                .orElseThrow(() -> new NotFoundException("CardInfo wasn't found with id " + cardId)));
+                .orElseThrow(() -> new CardInfoNotFoundException("CardInfo wasn't found with id " + cardId)));
         cardInfoRepository.deleteById(cardId);
         log.info("deleteCardInfo(): {}",cardInfo);
         return CardInfoMapper.INSTANSE.toDto(cardInfo.get());
     }
 
     /**
-     * Возвращает банковскую карту по ее number.
+     * Returns the CardInfo by its number.
      *
-     * @param number номер карты.
-     * @return DTO найденной карты.
-     * @throws NotFoundException если карта с указанным number не найдена.
+     * @param number CardInfo number
+     * @return DTO of the found CardInfo
+     * @throws CardInfoNotFoundException if no CardInfo with the specified number is found
      */
     @Override
     @Transactional(readOnly = true)
     public CardInfoDto getCardInfoByNumber(String number) {
         Optional<CardInfo> cardInfo = Optional.ofNullable(cardInfoRepository.findByNumber(number)
-                .orElseThrow(() -> new NotFoundException("CardInfo wasn't found with number " + number)));
+                .orElseThrow(() -> new CardInfoNotFoundException("CardInfo wasn't found with number " + number)));
         log.info("getCardInfoByNumber(): {}",number);
         return  CardInfoMapper.INSTANSE.toDto(cardInfo.get());
     }
 
     /**
-     *Возвращает список карт, принадлежащих пользователю с заданным userId.
+     * Returns a list of CardInfos belonging to the User with the specified userId.
      *
-     * @param userId Id пользователя, чьи карты нужно найти
-     * @return Список DTO карт с указанного пользователя
+     * @param userId ID of the User whose CardInfos should be retrieved
+     * @return List of card CardInfoDtos for the specified User
      */
     @Override
     @Transactional(readOnly = true)
@@ -164,10 +165,10 @@ public class CardInfoServiceImpl implements CardInfoService {
     }
 
     /**
-     *Возвращает список карт по заданному набору идентификаторов.
+     * Returns a list of CardInfos by the specified set of IDs.
      *
-     * @param ids Набор идентификаторов карт для поиска
-     * @return Список DTO карт с указанными идентификаторами
+     * @param ids Set of CardInfos IDs to search for
+     * @return List of CardInfoDtos with the specified IDs
      */
     @Override
     @Transactional(readOnly = true)
@@ -178,9 +179,9 @@ public class CardInfoServiceImpl implements CardInfoService {
     }
 
     /**
-     *Возвращает список карт, срок которых истек.
+     * Returns a list of expired CardInfos.
      *
-     * @return Список DTO карт с истекшим сроком
+     * @return List of expired CardInfoDtos
      */
     @Override
     @Transactional(readOnly = true)
@@ -191,9 +192,9 @@ public class CardInfoServiceImpl implements CardInfoService {
     }
 
     /**
-     * Возвращает список всех карт.
+     * Returns a list of all CardInfos.
      *
-     * @return Список DTO всех карт.
+     * @return List of all CardInfoDtos
      */
     @Override
     @Transactional(readOnly = true)
@@ -204,11 +205,11 @@ public class CardInfoServiceImpl implements CardInfoService {
     }
 
     /**
-     * Возвращает страницу с картами, используя нативную пагинацию и сортировку по ID.
+     * Returns a page of CardInfos using native pagination sorted by ID.
      *
-     * @param page Номер страницы (начиная с 0).
-     * @param size Количество карт на странице.
-     * @return Страница с DTO карт.
+     * @param page Page number (0-based index)
+     * @param size Number of CardInfos per page
+     * @return Page of card CardInfoDtos
      */
     @Override
     @Transactional(readOnly = true)

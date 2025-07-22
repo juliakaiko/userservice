@@ -16,12 +16,6 @@ import org.springframework.format.annotation.DateTimeFormat;
 import java.io.Serializable;
 import java.time.LocalDate;
 
-/*@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-@EqualsAndHashCode
-@ToString*/
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -47,19 +41,18 @@ public class UserDto implements Serializable {
     @NotBlank(message = "Email address may not be blank")
     private String email;
 
-
     /**
-     * Пароль пользователя. Должен соответствовать следующим требованиям:
+     * User password. Must meet the following requirements:
      * <ul>
-     *     <li>Не может быть пустым или состоять только из пробелов ({@code @NotBlank})</li>
-     *     <li>Длина должна быть от 5 до 255 символов ({@code @Size})</li>
+     *     <li>Cannot be empty or contain only whitespace ({@code @NotBlank})</li>
+     *     <li>Length must be between 5 and 255 characters ({@code @Size})</li>
      * </ul>
      *
-     * <p>При сериализации в JSON пароль игнорируется ({@code @JsonProperty(access = WRITE_ONLY)}),
-     * чтобы избежать его случайного раскрытия в API-ответах. Однако пароль остается доступным
-     * для десериализации (например, при получении данных от клиента) и сохраняется в кэше/БД.
+     * <p>When serialized to JSON, the password is ignored ({@code @JsonProperty(access = WRITE_ONLY)})
+     * to prevent accidental exposure in API responses. However, the password remains available
+     * for deserialization (e.g., when receiving data from client) and is saved in cache/database.
      *
-     * <p>Пример корректного пароля: {@code "secure123"}.
+     * <p>Example of valid password: {@code "secure123"}.
      *
      * @see NotBlank
      * @see Size
@@ -71,6 +64,6 @@ public class UserDto implements Serializable {
     private String password;
 
     @NotNull
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)  // Пароль принимается в JSON, но не выводится
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private Role role;
 }
