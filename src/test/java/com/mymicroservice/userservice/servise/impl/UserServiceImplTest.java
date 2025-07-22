@@ -51,6 +51,7 @@ public class UserServiceImplTest {
     @BeforeEach
     void setUp() {
         testUser = UserGenerator.generateUser();
+        testUser.setUserId(1l);
         testUserDto = UserMapper.INSTANSE.toDto(testUser);
     }
 

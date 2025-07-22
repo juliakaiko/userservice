@@ -7,6 +7,7 @@ import com.mymicroservice.userservice.model.CardInfo;
 import com.mymicroservice.userservice.service.CardInfoService;
 import com.mymicroservice.userservice.util.CardInfoGenerator;
 import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.BeforeEach;
 import org.springframework.data.domain.Page;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -56,12 +57,17 @@ public class CardInfoControllerTest {
     private final static Long ENTITY_ID = 1L;
     private final static String CARD_NUMBER = "1111222233334444";
     private final static Long USER_ID = 1L;
+    private CardInfoDto cardInfoDto;
+
+    @BeforeEach
+    void setUp() {
+        CardInfo card = CardInfoGenerator.generateCardInfo();
+        card.setCardId(1l);
+        cardInfoDto = CardInfoMapper.INSTANSE.toDto(card);
+    }
 
     @Test
     public void getCardInfoById_ShouldReturnCardInfoDto() throws Exception {
-        CardInfo card = CardInfoGenerator.generateCardInfo();
-        CardInfoDto cardInfoDto = CardInfoMapper.INSTANSE.toDto(card);
-
         when(cardInfoService.getCardInfoById(ENTITY_ID)).thenReturn(cardInfoDto);
 
         mockMvc.perform(get("/api/cards/{id}", ENTITY_ID))
@@ -83,9 +89,6 @@ public class CardInfoControllerTest {
 
     @Test
     public void getCardInfoByNumber_ShouldReturnCardInfoDto() throws Exception {
-        CardInfo card = CardInfoGenerator.generateCardInfo();
-        CardInfoDto cardInfoDto = CardInfoMapper.INSTANSE.toDto(card);
-
         when(cardInfoService.getCardInfoByNumber(CARD_NUMBER)).thenReturn(cardInfoDto);
 
         mockMvc.perform(get("/api/cards/find-by-number")
@@ -125,9 +128,6 @@ public class CardInfoControllerTest {
 
     @Test
     public void getCardInfoByUserId_ShouldReturnList() throws Exception {
-        CardInfo card = CardInfoGenerator.generateCardInfo();
-        CardInfoDto cardInfoDto = CardInfoMapper.INSTANSE.toDto(card);
-
         List<CardInfoDto> cardInfoDtos = List.of(cardInfoDto);
 
         when(cardInfoService.getByUserId(USER_ID)).thenReturn(cardInfoDtos);
@@ -168,9 +168,6 @@ public class CardInfoControllerTest {
 
     @Test
     public void getAllCardInfos_ShouldReturnList() throws Exception {
-        CardInfo card = CardInfoGenerator.generateCardInfo();
-        CardInfoDto cardInfoDto = CardInfoMapper.INSTANSE.toDto(card);
-
         List<CardInfoDto> cardInfoDtos = List.of(cardInfoDto);
 
         when(cardInfoService.getAllCardInfos()).thenReturn(cardInfoDtos);
@@ -201,14 +198,11 @@ public class CardInfoControllerTest {
 
     @Test
     public void createCardInfo_ShouldReturnCreatedCardDto() throws Exception {
-        CardInfo card = CardInfoGenerator.generateCardInfo();
-        CardInfoDto requestDto = CardInfoMapper.INSTANSE.toDto(card);
-
-        when(cardInfoService.createCardInfo(any(CardInfoDto.class))).thenReturn(requestDto);
+        when(cardInfoService.createCardInfo(any(CardInfoDto.class))).thenReturn(cardInfoDto);
 
         mockMvc.perform(post("/api/cards/")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(requestDto)))
+                        .content(objectMapper.writeValueAsString(cardInfoDto)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.cardId").value(ENTITY_ID))
                 .andExpect(jsonPath("$.number").value(CARD_NUMBER));
@@ -218,45 +212,40 @@ public class CardInfoControllerTest {
 
     @Test
     public void updateCardInfo_ShouldReturnUpdatedCardDto() throws Exception {
-        CardInfoDto requestDto = CardInfoMapper.INSTANSE.toDto(CardInfoGenerator.generateCardInfo());
-
         CardInfoDto responseDto = CardInfoMapper.INSTANSE.toDto(CardInfoGenerator.generateCardInfo());
+        responseDto.setCardId(1l);
         responseDto.setNumber("1111555577779999");
 
-        when(cardInfoService.updateCardInfo(ENTITY_ID, requestDto)).thenReturn(responseDto);
+        when(cardInfoService.updateCardInfo(ENTITY_ID, cardInfoDto)).thenReturn(responseDto);
 
         mockMvc.perform(put("/api/cards/{id}", ENTITY_ID)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(requestDto)))
+                        .content(objectMapper.writeValueAsString(cardInfoDto)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.cardId").value(ENTITY_ID))
                 .andExpect(jsonPath("$.number").value("1111555577779999"));
 
-        verify(cardInfoService).updateCardInfo(ENTITY_ID, requestDto);
+        verify(cardInfoService).updateCardInfo(ENTITY_ID, cardInfoDto);
     }
 
     @Test
     public void updateCardInfo_ShouldReturnNotFound() throws Exception {
-        CardInfoDto requestDto = CardInfoMapper.INSTANSE.toDto(CardInfoGenerator.generateCardInfo());
-
         CardInfoDto responseDto = CardInfoMapper.INSTANSE.toDto(CardInfoGenerator.generateCardInfo());
         responseDto.setNumber("1111555577779999");
 
-        when(cardInfoService.updateCardInfo(ENTITY_ID, requestDto)).thenReturn(null);
+        when(cardInfoService.updateCardInfo(ENTITY_ID, cardInfoDto)).thenReturn(null);
 
         mockMvc.perform(put("/api/cards/{id}", ENTITY_ID)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(requestDto)))
+                        .content(objectMapper.writeValueAsString(cardInfoDto)))
                 .andExpect(status().isNotFound());
 
-        verify(cardInfoService).updateCardInfo(ENTITY_ID, requestDto);
+        verify(cardInfoService).updateCardInfo(ENTITY_ID, cardInfoDto);
     }
 
     @Test
     public void deleteCardInfo_ShouldReturnDeletedCardDto() throws Exception {
-        CardInfoDto responseDto = CardInfoMapper.INSTANSE.toDto(CardInfoGenerator.generateCardInfo());
-
-        when(cardInfoService.deleteCardInfo(ENTITY_ID)).thenReturn(responseDto);
+        when(cardInfoService.deleteCardInfo(ENTITY_ID)).thenReturn(cardInfoDto);
 
         mockMvc.perform(delete("/api/cards/{id}", ENTITY_ID))
                 .andExpect(status().isOk())

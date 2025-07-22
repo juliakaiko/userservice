@@ -52,12 +52,22 @@ public class CardInfoServiceImplIT extends TestContainersConfig {
 
     private CardInfo testCardInfo;
     private CardInfoDto testCardInfoDto;
+    private User user;
 
     @BeforeEach
     void setUp() {
         cardInfoRepository.deleteAll();
+        userRepository.deleteAll();
+
+        user = UserGenerator.generateUser();
+        user.setUserCards(new HashSet<>());
+        user = userRepository.save(user);
+
         testCardInfo = CardInfoGenerator.generateCardInfo();
+        testCardInfo.setUserId(user);
         testCardInfoDto = CardInfoMapper.INSTANSE.toDto(testCardInfo);
+        testCardInfoDto.setUserId(user.getUserId());
+        cacheManager.getCache("cardInfoCache").clear();
     }
 
     @Test
@@ -183,10 +193,6 @@ public class CardInfoServiceImplIT extends TestContainersConfig {
 
     @Test
     void getCardInfosIdIn_ShouldReturnCardInfosWithGivenIds() {
-        User user = UserGenerator.generateUser();
-        user.setUserCards(new HashSet<>());
-        userRepository.save(user);
-
         List<CardInfoDto> cardInfos = LongStream.range(1, 6) // stream:  1,2,3,4,5
                 .mapToObj(i -> cardInfoService.createCardInfo(
                         CardInfoDto.builder()
@@ -194,7 +200,7 @@ public class CardInfoServiceImplIT extends TestContainersConfig {
                                 .number("111122223333444"+i)
                                 .holder("TestUser")
                                 .expirationDate(LocalDate.of(2030, 3, 3))
-                                .userId(user.getUserId())
+                                .userId(testCardInfoDto.getUserId())
                                 .build()
                 )).collect(Collectors.toList());
 
@@ -208,21 +214,14 @@ public class CardInfoServiceImplIT extends TestContainersConfig {
 
     @Test
     void getExpiredCards_ShouldReturnCardsExpiredAfterGivenDate() {
-        User user = UserGenerator.generateUser();
-        user.setUserCards(new HashSet<>());
-        userRepository.save(user);
-
-        CardInfo createdCardInfo = CardInfo.builder()
-                .cardId(1l)
+        CardInfoDto cardInfoDto = CardInfoDto.builder()
                 .number("1111222233334444")
                 .holder("TestUser")
                 .expirationDate(LocalDate.of(2024, 3, 3))
-                .userId(user)
+                .userId(user.getUserId())
                 .build();
-        user.getUserCards().add(createdCardInfo);
 
-        CardInfoDto createdCardInfoDto = CardInfoMapper.INSTANSE.toDto(createdCardInfo);
-        cardInfoService.createCardInfo(createdCardInfoDto);
+        cardInfoService.createCardInfo(cardInfoDto);
 
         List<CardInfoDto> expiredCards = cardInfoService.getExpiredCards();
         LocalDate date = LocalDate.now();
@@ -245,10 +244,6 @@ public class CardInfoServiceImplIT extends TestContainersConfig {
 
     @Test
     void getAllCardInfos_ShouldReturnAllCardInfos() {
-        User user = UserGenerator.generateUser();
-        user.setUserCards(new HashSet<>());
-        userRepository.save(user);
-
         cardInfoService.createCardInfo(testCardInfoDto);
 
         cardInfoService.createCardInfo(
@@ -266,9 +261,6 @@ public class CardInfoServiceImplIT extends TestContainersConfig {
 
     @Test
     void getAllCardInfosNativeWithPagination_ShouldReturnPageOfCardInfos() {
-        User user = UserGenerator.generateUser();
-        user.setUserCards(new HashSet<>());
-        userRepository.save(user);
         List<CardInfoDto> cardInfos = LongStream.range(1, 5) // поток Stream: 1,2,3,4
                 .mapToObj(i -> cardInfoService.createCardInfo(
                         CardInfoDto.builder()

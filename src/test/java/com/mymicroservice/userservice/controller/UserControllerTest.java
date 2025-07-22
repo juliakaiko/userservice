@@ -1,13 +1,16 @@
 package com.mymicroservice.userservice.controller;
 
+import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mymicroservice.userservice.dto.UserDto;
+import com.mymicroservice.userservice.exception.UserNotFoundException;
 import com.mymicroservice.userservice.mapper.UserMapper;
 import com.mymicroservice.userservice.model.Role;
 import com.mymicroservice.userservice.model.User;
 import com.mymicroservice.userservice.service.UserService;
 import com.mymicroservice.userservice.util.UserGenerator;
 import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -55,12 +58,22 @@ public class UserControllerTest {
 
     private final static Long USER_ID = 1L;
     private final static String USER_EMAIL = "test@test.by";
+    private UserDto userDto;
+
+    @BeforeEach
+    void setUp() {
+        User user  = UserGenerator.generateUser();
+        user.setUserId(1l);
+        userDto = UserMapper.INSTANSE.toDto(user);
+        disableAnnotationsInObjectMapper();
+    }
+
+    private void disableAnnotationsInObjectMapper() {
+        objectMapper.disable(MapperFeature.USE_ANNOTATIONS); // Disable @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    }
 
     @Test
     public void getUserById_ShouldReturnUserDto() throws Exception {
-        User user  = UserGenerator.generateUser();
-        UserDto userDto = UserMapper.INSTANSE.toDto(user);
-
         when(userService.getUserById(USER_ID)).thenReturn(userDto);
 
         mockMvc.perform(get("/api/users/{id}", USER_ID))
@@ -82,9 +95,6 @@ public class UserControllerTest {
 
     @Test
     public void getUserByEmail_ShouldReturnUserDto() throws Exception {
-        User user = UserGenerator.generateUser();
-        UserDto userDto = UserMapper.INSTANSE.toDto(user);
-
         when(userService.getUsersByEmail(USER_EMAIL)).thenReturn(userDto);
 
         mockMvc.perform(get("/api/users/find-by-email")
@@ -100,7 +110,7 @@ public class UserControllerTest {
         when(userService.getUsersByEmail(USER_EMAIL)).thenReturn(null);
 
         mockMvc.perform(get("/api/users/find-by-email")
-                        .param("emai", USER_EMAIL))
+                        .param("email", USER_EMAIL))
                 .andExpect(status().isNotFound());
 
         verify(userService).getUsersByEmail(USER_EMAIL);
@@ -124,15 +134,12 @@ public class UserControllerTest {
 
     @Test
     public void getUserByRole_ShouldReturnList() throws Exception {
-        User user = UserGenerator.generateUser();
-        UserDto userDto = UserMapper.INSTANSE.toDto(user);
-
         List<UserDto> userDtos = List.of(userDto);
 
         when(userService.getUsersByRole(Role.USER)).thenReturn(userDtos);
 
         mockMvc.perform(get("/api/users/find-by-role").
-                        param("role"))
+                        param("role", Role.USER.toString()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray())
                 .andExpect(jsonPath("$.length()").value(1));
@@ -158,9 +165,11 @@ public class UserControllerTest {
                                 .build()
                 )).collect(Collectors.toList());
 
-        when(userService.getUsersBornAfter(LocalDate.of(1990, 1, 1))).thenReturn(users);
+        LocalDate testDate = LocalDate.of(1990, 1, 1);
+        when(userService.getUsersBornAfter(testDate)).thenReturn(users);
 
-        mockMvc.perform(get("/api/users/born-after"))
+        mockMvc.perform(get("/api/users/born-after")
+                        .param("date", testDate.toString()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray())
                 .andExpect(jsonPath("$.length()").value(3));
@@ -170,9 +179,6 @@ public class UserControllerTest {
 
     @Test
     public void getAllUsers_ShouldReturnList() throws Exception {
-        User user = UserGenerator.generateUser();
-        UserDto userDto = UserMapper.INSTANSE.toDto(user);
-
         List<UserDto> userDtos = List.of(userDto);
 
         when(userService.getAllUsers()).thenReturn(userDtos);
@@ -203,9 +209,6 @@ public class UserControllerTest {
 
     @Test
     public void createUser_ShouldReturnCreatedUserDto() throws Exception {
-        User user = UserGenerator.generateUser();
-        UserDto userDto = UserMapper.INSTANSE.toDto(user);
-
         when(userService.createUser(any(UserDto.class))).thenReturn(userDto);
 
         mockMvc.perform(post("/api/users/")
@@ -220,45 +223,40 @@ public class UserControllerTest {
 
     @Test
     public void updateUser_ShouldReturnUpdatedUserDto() throws Exception {
-        UserDto requestDto = UserMapper.INSTANSE.toDto(UserGenerator.generateUser());
-
         UserDto responseDto = UserMapper.INSTANSE.toDto(UserGenerator.generateUser());
+        responseDto.setUserId(1l);
         responseDto.setEmail("updated_email@test.by");
 
-        when(userService.updateUser(USER_ID, requestDto)).thenReturn(responseDto);
+        when(userService.updateUser(USER_ID, userDto)).thenReturn(responseDto);
 
         mockMvc.perform(put("/api/users/{id}", USER_ID)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(requestDto)))
+                        .content(objectMapper.writeValueAsString(userDto)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.userId").value(USER_ID))
                 .andExpect(jsonPath("$.email").value("updated_email@test.by"));
 
-        verify(userService).updateUser(USER_ID, requestDto);
+        verify(userService).updateUser(USER_ID, userDto);
     }
 
     @Test
     public void updateUser_ShouldReturnNotFound() throws Exception {
-        UserDto requestDto = UserMapper.INSTANSE.toDto(UserGenerator.generateUser());
+        userDto.setEmail("updated_email@test.by");
 
-        UserDto responseDto = UserMapper.INSTANSE.toDto(UserGenerator.generateUser());
-        responseDto.setEmail("updated_email@test.by");
-
-        when(userService.updateUser(USER_ID, requestDto)).thenReturn(null);
+        when(userService.updateUser(USER_ID, userDto))
+                .thenThrow(new UserNotFoundException("User wasn't found with id " + USER_ID));
 
         mockMvc.perform(put("/api/users/{id}", USER_ID)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(requestDto)))
+                        .content(objectMapper.writeValueAsString(userDto)))
                 .andExpect(status().isNotFound());
 
-        verify(userService).updateUser(USER_ID, requestDto);
+        verify(userService).updateUser(USER_ID, userDto);
     }
 
     @Test
     public void deleteUser_ShouldReturnDeletedUserDto() throws Exception {
-        UserDto responseDto = UserMapper.INSTANSE.toDto(UserGenerator.generateUser());
-
-        when(userService.deleteUser(USER_ID)).thenReturn(responseDto);
+        when(userService.deleteUser(USER_ID)).thenReturn(userDto);
 
         mockMvc.perform(delete("/api/users/{id}", USER_ID))
                 .andExpect(status().isOk())

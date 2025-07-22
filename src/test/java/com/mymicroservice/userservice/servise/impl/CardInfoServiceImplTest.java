@@ -56,6 +56,9 @@ public class CardInfoServiceImplTest {
     @BeforeEach
     void setUp() {
         testCardInfo = CardInfoGenerator.generateCardInfo();
+        User user = UserGenerator.generateUser();
+        user.setUserId(1l);
+        testCardInfo.setUserId(user);
         testCardInfoDto = CardInfoMapper.INSTANSE.toDto(testCardInfo);
     }
 

@@ -11,13 +11,21 @@ services:
       redis:
         condition: service_healthy # Wait until redis healthcheck passes
     environment:
-      - DB_HOST=postgres
-      - DB_PORT=5432
-      - DB_NAME=userserviceDB
-      - DB_USER=postgres
-      - DB_PASSWORD=Kaiko1994Ulia
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/userserviceDB
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=Kaiko1994Ulia
+      - SPRING_LIQUIBASE_URL=jdbc:postgresql://postgres:5432/userserviceDB
+      - SPRING_LIQUIBASE_USER=postgres
+      - SPRING_LIQUIBASE_PASSWORD=Kaiko1994Ulia
+      - SPRING_DATA_REDIS_HOST=redis
+      - SPRING_DATA_REDIS_PORT=6379
+      #- DB_HOST=postgres
+      #- DB_PORT=5432
+      #- DB_NAME=userserviceDB
+      #- DB_USER=postgres
+      #- DB_PASSWORD=Kaiko1994Ulia
       #- SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/userserviceDB
-      - REDIS_HOST=redis
+      #- REDIS_HOST=redis
       #- SPRING_DATA_REDIS_USERNAME=default
       #- SPRING_DATA_REDIS_PASSWORD=12345
     networks:
@@ -53,6 +61,9 @@ services:
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]  # without password
       #test: [ "CMD", "redis-cli", "-a", "12345", "ping" ] # alternative check with password
+      interval: 5s # Checking every 5 seconds
+      timeout: 5s # Checking timeout
+      retries: 5 # Number of attempts
     networks:
       - myproject-network
 

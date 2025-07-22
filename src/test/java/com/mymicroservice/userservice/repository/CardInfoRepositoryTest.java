@@ -4,7 +4,9 @@ import com.mymicroservice.userservice.configuration.TestContainersConfig;
 import com.mymicroservice.userservice.dto.CardInfoDto;
 import com.mymicroservice.userservice.mapper.CardInfoMapper;
 import com.mymicroservice.userservice.model.CardInfo;
+import com.mymicroservice.userservice.model.User;
 import com.mymicroservice.userservice.util.CardInfoGenerator;
+import com.mymicroservice.userservice.util.UserGenerator;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -36,16 +38,23 @@ public class CardInfoRepositoryTest extends TestContainersConfig {
     @Autowired
     private CardInfoRepository cardInfoRepository;
 
-    private static CardInfo expectedCardInfo;
+    @Autowired
+    private UserRepository userRepository;
 
-    @BeforeAll
-    public static void setUp(){
-        expectedCardInfo = CardInfoGenerator.generateCardInfo();
-    }
+    private User expectedUser;
+
+    private CardInfo expectedCardInfo;
 
     @BeforeEach
     public void init() {
         cardInfoRepository.deleteAll();
+        userRepository.deleteAll();
+
+        expectedUser = UserGenerator.generateUser();
+        expectedUser = userRepository.save(expectedUser);
+
+        expectedCardInfo = CardInfoGenerator.generateCardInfo();
+        expectedCardInfo.setUserId(expectedUser);
         expectedCardInfo = cardInfoRepository.save(expectedCardInfo);
     }
 

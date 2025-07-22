@@ -52,6 +52,7 @@ public class UserServiceImplIT extends TestContainersConfig {
         userRepository.deleteAll();
         testUser = UserGenerator.generateUser();
         testUserDto = UserMapper.INSTANSE.toDto(testUser);
+        cacheManager.getCache("userCache").clear();
     }
 
     @Test
