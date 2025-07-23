@@ -28,21 +28,18 @@ jobs:
           java-version: '21'
           distribution: 'temurin'
 
-        # Разделено на два шага
       - name: Compile and test
         run: |
           mvn -B clean test
-          # <span style="color:red">[NEW] Убиваем зависшие процессы Surefire</span>
           pkill -f surefirebooter || true
 
-      # Отдельный шаг сборки WAR
       - name: Build WAR
         run: mvn -B package -DskipTests
 
       - name: Prepare for Sonar analysis
         run: |
-          mkdir -p target/sonar-libs/WEB-INF/lib
-          unzip -q -j target/*.war 'WEB-INF/lib/*.jar' -d target/sonar-libs/WEB-INF/lib || echo "No libraries found in WAR"
+          mkdir -p target/unpacked-libs/WEB-INF/lib
+          unzip -q -j target/*.war 'WEB-INF/lib/*.jar' -d target/unpacked-libs/WEB-INF/lib || echo "No libraries found in WAR"
 
       - name: SonarQube Analysis
         env:
