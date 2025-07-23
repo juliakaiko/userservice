@@ -12,7 +12,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0  
+          fetch-depth: 0
 
       - name: Cache Maven dependencies
         uses: actions/cache@v4
@@ -28,16 +28,13 @@ jobs:
           java-version: '21'
           distribution: 'temurin'
 
-      - name: Run Tests
-        run: mvn test
-
-      # Модифицированный шаг сборки с компиляцией
       - name: Build and prepare for SonarQube
         run: |
-          mvn -B clean compile
-          mvn -B package -DskipTests
+          mvn -B clean package
+          # Распаковываем WAR для анализа зависимостей
+          mkdir -p target/unpacked-libs
+          unzip -q target/userservice-*.war -d target/unpacked-libs/WEB-INF/lib
 
-      # Обновленный шаг анализа SonarQube
       - name: SonarQube Analysis
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
@@ -49,7 +46,7 @@ jobs:
             -Dsonar.host.url=$SONAR_HOST_URL \
             -Dsonar.organization=juliakaiko \
             -Dsonar.java.binaries=target/classes \
-            -Dsonar.java.libraries=target/*.jar
+            -Dsonar.java.libraries=target/unpacked-libs/WEB-INF/lib/*.jar
 
       - name: SonarQube Quality Gate Check
         uses: sonarsource/sonarqube-quality-gate-action@master
