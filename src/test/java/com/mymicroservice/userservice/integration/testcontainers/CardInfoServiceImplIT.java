@@ -36,7 +36,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 @SpringBootTest
 @ActiveProfiles("test")
 @Transactional
-public class CardInfoServiceImplIT extends TestContainersConfig {
+public class CardInfoServiceImplIT  extends TestContainersConfig{
 
     @Autowired
     private CardInfoServiceImpl cardInfoService;

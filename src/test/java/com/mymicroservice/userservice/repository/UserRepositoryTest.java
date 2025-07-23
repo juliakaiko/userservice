@@ -1,25 +1,21 @@
 package com.mymicroservice.userservice.repository;
 
 import com.mymicroservice.userservice.configuration.TestContainersConfig;
-import com.mymicroservice.userservice.dto.CardInfoDto;
-import com.mymicroservice.userservice.dto.UserDto;
-import com.mymicroservice.userservice.mapper.CardInfoMapper;
-import com.mymicroservice.userservice.mapper.UserMapper;
-import com.mymicroservice.userservice.model.CardInfo;
 import com.mymicroservice.userservice.model.Role;
 import com.mymicroservice.userservice.model.User;
-import com.mymicroservice.userservice.util.CardInfoGenerator;
 import com.mymicroservice.userservice.util.UserGenerator;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.test.context.ActiveProfiles;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -34,7 +30,9 @@ import static org.junit.Assert.assertTrue;
 
 @Slf4j
 @DataJpaTest
+@ActiveProfiles("test")
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE) // Disabling DataSource Replacement
+@Import(TestContainersConfig.class)
 public class UserRepositoryTest extends TestContainersConfig {
 
     @Autowired
@@ -43,12 +41,12 @@ public class UserRepositoryTest extends TestContainersConfig {
     private static User expectedUser;
 
     @BeforeAll
-    public static void setUp(){
+    static void setUp(){
         expectedUser = UserGenerator.generateUser();
     }
 
     @BeforeEach
-    public void init() {
+    void init() {
         userRepository.deleteAll();
         expectedUser = userRepository.save(expectedUser);
     }
