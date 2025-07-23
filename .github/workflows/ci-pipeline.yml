@@ -15,7 +15,7 @@ jobs:
 
       # Кэширование зависимостей Maven
       - name: Cache Maven dependencies
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: ~/.m2/repository
           key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
@@ -49,6 +49,8 @@ jobs:
             -Dsonar.projectName=UserService
             -Dsonar.host.url=${{ env.SONAR_HOST_URL }}
             -DskipTests
+            -Dsonar.organization=juliakaiko
+            
 
       # Проверка SonarQube Quality Gate
       - name: SonarQube Quality Gate Check
@@ -67,6 +69,7 @@ jobs:
 
       # Сборка и публикация Docker-образа
       - name: Build and Push Docker Image
+        if: success()
         run: |
           docker build -t juliakaiko94/user-service:latest .
           docker push juliakaiko94/user-service:latest
