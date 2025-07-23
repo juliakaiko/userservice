@@ -45,12 +45,11 @@ jobs:
           SONAR_HOST_URL: https://sonarcloud.io
         with:
           args: >
-            -Dsonar.projectKey=userservice
+            -Dsonar.projectKey=juliakaiko_userservice
             -Dsonar.projectName=UserService
             -Dsonar.host.url=${{ env.SONAR_HOST_URL }}
             -DskipTests
             -Dsonar.organization=juliakaiko
-            
 
       # Проверка SonarQube Quality Gate
       - name: SonarQube Quality Gate Check
