@@ -272,19 +272,19 @@
 				<artifactId>liquibase-maven-plugin</artifactId>
 				<version>${org.liquibase.version}</version>
 			</plugin>
-			<plugin>
+			<!--<plugin>
 				<groupId>com.spotify</groupId>
 				<artifactId>dockerfile-maven-plugin</artifactId>
 				<version>1.4.13</version>
 				<configuration>
-					<repository>tasksystem</repository>
+					<repository>juliakaiko94/user-service</repository>
 					<tag>latest</tag>
 					<buildArgs>
-						<!--<JAR_FILE>userservice-0.0.1-SNAPSHOT.jar</JAR_FILE>-->
+						&lt;!&ndash;<JAR_FILE>userservice-0.0.1-SNAPSHOT.jar</JAR_FILE>&ndash;&gt;
 						<WAR_FILE>userservice-0.0.1-SNAPSHOT.war</WAR_FILE>
 					</buildArgs>
 				</configuration>
-			</plugin>
+			</plugin>-->
 			<!--For correct testing-->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
