@@ -1,17 +1,11 @@
-# Use the official Tomcat image with Java 21
-FROM tomcat:10.1-jdk21-temurin
+FROM eclipse-temurin:21-jre
 
-# Remove default Tomcat apps
-RUN rm -rf /usr/local/tomcat/webapps/*
+WORKDIR /app
 
-# Install redis-tools for Redis CLI support
-RUN apt-get update && apt-get install -y redis-tools
+# Copy the JAR file into the container
+COPY target/userservice-0.0.1-SNAPSHOT.jar app.jar
 
-# Copy the WAR file into the container (renamed to ROOT.war for root URL access)
-COPY target/userservice-0.0.1-SNAPSHOT.war /usr/local/tomcat/webapps/ROOT.war
-
-# Expose Tomcat's default port
 EXPOSE 8080
 
-# Start Tomcat
-CMD ["catalina.sh", "run"]
+ENTRYPOINT ["java", "-Dspring.profiles.active=prod", "-jar", "app.jar"]
+

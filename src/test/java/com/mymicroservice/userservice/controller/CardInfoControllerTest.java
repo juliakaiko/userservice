@@ -1,6 +1,7 @@
 package com.mymicroservice.userservice.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.mymicroservice.userservice.configuration.SecurityConfig;
 import com.mymicroservice.userservice.dto.CardInfoDto;
 import com.mymicroservice.userservice.mapper.CardInfoMapper;
 import com.mymicroservice.userservice.model.CardInfo;
@@ -8,6 +9,8 @@ import com.mymicroservice.userservice.service.CardInfoService;
 import com.mymicroservice.userservice.util.CardInfoGenerator;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Page;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -18,6 +21,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDate;
@@ -39,6 +43,9 @@ import static org.mockito.Mockito.any;
 
 @WebMvcTest(controllers = CardInfoController.class)
 @ExtendWith(MockitoExtension.class)
+@AutoConfigureMockMvc(addFilters = true)
+@Import(SecurityConfig.class)
+@WithMockUser(roles = {"ADMIN", "USER"})
 @Slf4j
 public class CardInfoControllerTest {
 

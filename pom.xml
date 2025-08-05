@@ -5,28 +5,16 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>3.3.4</version> <!-- с этой версий работает Swagger -->
-		<relativePath/> <!-- lookup parent from repository -->
+		<version>3.3.4</version>
+		<relativePath/>
 	</parent>
 	<groupId>com.mymicroservice</groupId>
 	<artifactId>userservice</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<packaging>war</packaging>
+	<packaging>jar</packaging>
 	<name>userservice</name>
 	<description>Demo project for Spring Boot</description>
-	<url/>
-	<licenses>
-		<license/>
-	</licenses>
-	<developers>
-		<developer/>
-	</developers>
-	<scm>
-		<connection/>
-		<developerConnection/>
-		<tag/>
-		<url/>
-	</scm>
+
 	<properties>
 		<java.version>21</java.version>
 		<org.projectlombok.version>1.18.32</org.projectlombok.version>
@@ -36,7 +24,7 @@
 		<liquibase-maven-plugin.version>4.27.0</liquibase-maven-plugin.version>
 		<lombok-mapstruct-binding.version>0.2.0</lombok-mapstruct-binding.version>
 		<org.liquibase.version>4.27.0</org.liquibase.version>
-		<jjwt.version>0.12.3</jjwt.version>
+		<jjwt.version>0.11.5</jjwt.version> <!--   0.12.3 -->
 		<org.testcontainers.version>1.19.8</org.testcontainers.version>
 		<sonar.organization>juliakaiko</sonar.organization>
 		<sonar.projectKey>juliakaiko_userservice</sonar.projectKey>
@@ -63,6 +51,15 @@
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-security</artifactId>
+		</dependency>
+		<!-- Spring Security + JWT (OAuth2 Resource Server) -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-oauth2-resource-server</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-logging</artifactId>
 		</dependency>
 		<dependency>
@@ -73,6 +70,8 @@
 			<groupId>org.liquibase</groupId>
 			<artifactId>liquibase-core</artifactId>
 		</dependency>
+
+		<!-- Testing -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
@@ -83,11 +82,6 @@
 					<artifactId>jsonassert</artifactId>
 				</exclusion>
 			</exclusions>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.security</groupId>
-			<artifactId>spring-security-test</artifactId>
-			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>junit</groupId>
@@ -126,25 +120,6 @@
 			<scope>test</scope>
 		</dependency>
 
-
-		<!-- Безопасность -->
-		<!--		<dependency>
-                    <groupId>org.springframework.boot</groupId>
-                    <artifactId>spring-boot-starter-security</artifactId>
-                </dependency>
-                <dependency>
-                    <groupId>io.jsonwebtoken</groupId>
-                    <artifactId>jjwt-api</artifactId>
-                </dependency>
-                <dependency>
-                    <groupId>io.jsonwebtoken</groupId>
-                    <artifactId>jjwt-impl</artifactId>
-                </dependency>
-                <dependency>
-                    <groupId>io.jsonwebtoken</groupId>
-                    <artifactId>jjwt-jackson</artifactId>
-                </dependency>-->
-
 		<!-- Postgres BD-->
 		<dependency>
 			<groupId>org.postgresql</groupId>
@@ -153,7 +128,7 @@
 			<scope>runtime</scope>
 		</dependency>
 
-		<!-- Redis -->
+		<!-- Redis+Cahce -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-data-redis</artifactId>
@@ -181,13 +156,6 @@
 			<scope>provided</scope>
 		</dependency>
 
-		<!-- Tomcat-->
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-tomcat</artifactId>
-			<scope>provided</scope>
-		</dependency>
-
 		<!-- Mapstruct for creating DTO-->
 		<dependency>
 			<groupId>org.mapstruct</groupId>
@@ -204,10 +172,35 @@
 		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>
 			<artifactId>jackson-databind</artifactId>
-			<version>2.17.0</version> <!-- Совместимая версия с Spring Boot 3.3.4 -->
+			<version>2.17.0</version> <!-- Compatible version with Spring Boot 3.3.4 -->
 		</dependency>
 
-	</dependencies>
+		<!-- JWT -->
+		<dependency>
+			<groupId>io.jsonwebtoken</groupId>
+			<artifactId>jjwt-api</artifactId>
+			<version>${jjwt.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>io.jsonwebtoken</groupId>
+			<artifactId>jjwt-impl</artifactId>
+			<version>${jjwt.version}</version>
+			<scope>runtime</scope>
+		</dependency>
+		<dependency>
+			<groupId>io.jsonwebtoken</groupId>
+			<artifactId>jjwt-jackson</artifactId>
+			<version>${jjwt.version}</version>
+			<scope>runtime</scope>
+		</dependency>
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-test</artifactId>
+            <version>6.5.2</version>
+            <scope>test</scope>
+        </dependency>
+
+    </dependencies>
 
 	<dependencyManagement>
 		<dependencies>
@@ -218,26 +211,23 @@
 				<type>pom</type>
 				<scope>import</scope>
 			</dependency>
-			<dependency>
-				<groupId>io.jsonwebtoken</groupId>
-				<artifactId>jjwt-api</artifactId>
-				<version>${jjwt.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>io.jsonwebtoken</groupId>
-				<artifactId>jjwt-impl</artifactId>
-				<version>${jjwt.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>io.jsonwebtoken</groupId>
-				<artifactId>jjwt-jackson</artifactId>
-				<version>${jjwt.version}</version>
-			</dependency>
 		</dependencies>
 	</dependencyManagement>
 
 	<build>
 		<plugins>
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+				<version>${project.parent.version}</version>
+				<executions>
+					<execution>
+						<goals>
+							<goal>repackage</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
@@ -245,7 +235,7 @@
 				<configuration>
 					<source>21</source>
 					<target>21</target>
-					<fork>true</fork>  <!-- Важно! -->
+					<fork>true</fork>  <!-- compilation must be performed in a separate JVM process! -->
 					<annotationProcessorPaths>
 						<path>
 							<groupId>org.testcontainers</groupId>
@@ -275,19 +265,6 @@
 				<artifactId>liquibase-maven-plugin</artifactId>
 				<version>${org.liquibase.version}</version>
 			</plugin>
-			<!--<plugin>
-				<groupId>com.spotify</groupId>
-				<artifactId>dockerfile-maven-plugin</artifactId>
-				<version>1.4.13</version>
-				<configuration>
-					<repository>juliakaiko94/user-service</repository>
-					<tag>latest</tag>
-					<buildArgs>
-						&lt;!&ndash;<JAR_FILE>userservice-0.0.1-SNAPSHOT.jar</JAR_FILE>&ndash;&gt;
-						<WAR_FILE>userservice-0.0.1-SNAPSHOT.war</WAR_FILE>
-					</buildArgs>
-				</configuration>
-			</plugin>-->
 			<!--For correct testing-->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>

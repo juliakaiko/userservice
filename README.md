@@ -8,14 +8,26 @@ A microservice for managing users and their cards, built on Spring Boot 3.3.4 us
 - API documentation via Swagger UI.
 - Docker support (build and deployment). 
 
+## 🧩 Architecture
+This project follows a layered architecture:
+
+- **Controller Layer**: Handles HTTP requests and maps to services.
+- **Service Layer**: Contains business logic.
+- **Repository Layer**: Interfaces with PostgreSQL using Spring Data JPA.
+- **DTO + Mapper Layer**: Used for clean data transfer and separation from entities.
+- **Caching Layer**: Redis integration for caching entity data.
+- **Global Exception Handling**: Uniform response structure for all errors.
+
 ## ⚙️ Technologies
 - Java 21
 - Spring Boot 3.3.4 (Web, Data JPA, Validation, Redis)
 - PostgreSQL (primary database)
+- Redis for caching
 - Liquibase (migrations)
 - MapStruct (DTO mapping)
 - Lombok (reducing boilerplate code)
 - SpringDoc OpenAPI (API documentation)
+- Docker for containerization
 
 ## 🧪 Testing
 - Unit Testing: JUnit 5 + Mockito for mocking dependencies. 

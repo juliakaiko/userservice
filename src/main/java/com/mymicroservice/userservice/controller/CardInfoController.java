@@ -1,6 +1,6 @@
 package com.mymicroservice.userservice.controller;
 
-import com.mymicroservice.userservice.annotation.UserExceptionHandler;
+import com.mymicroservice.userservice.annotation.GlobalExceptionHandler;
 import com.mymicroservice.userservice.dto.CardInfoDto;
 import com.mymicroservice.userservice.service.CardInfoService;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -29,7 +29,7 @@ import java.util.Set;
 @RequiredArgsConstructor
 @RequestMapping("/api/cards")
 @Tag(name="CardInfoController")
-@UserExceptionHandler
+@GlobalExceptionHandler
 @Slf4j
 @Validated // for @NotEmpty
 public class CardInfoController {

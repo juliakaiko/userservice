@@ -1,5 +1,6 @@
 package com.mymicroservice.userservice.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.mymicroservice.userservice.model.Role;
 import jakarta.validation.constraints.Email;
@@ -20,6 +21,7 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@JsonIgnoreProperties(ignoreUnknown = true) // ignore unknown fields
 public class UserDto implements Serializable {
 
     private Long userId;

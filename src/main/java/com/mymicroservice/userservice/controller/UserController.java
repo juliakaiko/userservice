@@ -1,6 +1,6 @@
 package com.mymicroservice.userservice.controller;
 
-import com.mymicroservice.userservice.annotation.UserExceptionHandler;
+import com.mymicroservice.userservice.annotation.GlobalExceptionHandler;
 import com.mymicroservice.userservice.dto.UserDto;
 import com.mymicroservice.userservice.model.Role;
 import com.mymicroservice.userservice.service.UserService;
@@ -11,6 +11,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.util.ObjectUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -31,12 +34,26 @@ import java.util.Set;
 @RequiredArgsConstructor
 @RequestMapping("/api/users")
 @Tag(name="UserController")
-@UserExceptionHandler
+@GlobalExceptionHandler
 @Slf4j
 @Validated // for @NotEmpty
 public class UserController {
 
     private final UserService userService;
+
+    public UserDto getAuthenticatedUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String currentPrincipalName = authentication.getName();
+        UserDto userDto = userService.getUsersByEmail(currentPrincipalName);
+        return userDto;
+    }
+
+    @GetMapping("/hello")
+    public ResponseEntity<?> sayHello () {
+        UserDto userDto = getAuthenticatedUser();
+        String greeting = "Hello, " + userDto.getName() + " " + userDto.getSurname();
+        return ResponseEntity.ok(greeting);
+    }
 
     @GetMapping("/{id}")
     public ResponseEntity<?> getUserById (@PathVariable("id") Long id) {
@@ -113,6 +130,7 @@ public class UserController {
                 : ResponseEntity.ok(savedUserDto);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity <?> deleteUser (@PathVariable("id") Long id){
         log.info("Request to delete the User by id: {}",id);

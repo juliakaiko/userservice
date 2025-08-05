@@ -1,13 +1,18 @@
 package com.mymicroservice.userservice.advice;
 
-import com.mymicroservice.userservice.annotation.UserExceptionHandler;
+import com.mymicroservice.userservice.annotation.GlobalExceptionHandler;
 import com.mymicroservice.userservice.exception.CardInfoNotFoundException;
 import com.mymicroservice.userservice.exception.UserNotFoundException;
 import com.mymicroservice.userservice.util.ErrorItem;
+import io.jsonwebtoken.JwtException;
 import jakarta.validation.ConstraintViolationException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
+import org.springframework.security.authorization.AuthorizationDeniedException;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -17,8 +22,8 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.stream.Collectors;
 
-@RestControllerAdvice(annotations = UserExceptionHandler.class)
-public class UserAdvice {
+@RestControllerAdvice(annotations = GlobalExceptionHandler.class)
+public class GlobalAdvice {
 
     /**
      * Handles validation exceptions for DTO fields when data fails validation annotations
@@ -82,6 +87,44 @@ public class UserAdvice {
     public ResponseEntity<ErrorItem> handleDataIntegrityViolationException(DataIntegrityViolationException e) {
         ErrorItem error = generateMessage(e, HttpStatus.BAD_REQUEST);
         return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+    }
+
+    /**
+     * Handles authorization denied exceptions when a user lacks required permissions.
+     *
+     * @param e AuthorizationDeniedException containing authorization failure details
+     * @return ResponseEntity with ErrorItem containing error details and HTTP 403 status (FORBIDDEN)
+     */
+    @ExceptionHandler({AuthorizationDeniedException.class})
+    public ResponseEntity<ErrorItem> handleAuthorizationDeniedException(AuthorizationDeniedException e) {
+        ErrorItem error = generateMessage(e, HttpStatus.FORBIDDEN);
+        return new ResponseEntity<>(error, HttpStatus.FORBIDDEN);
+    }
+/*
+
+    @ExceptionHandler({AuthenticationException.class})
+    public ResponseEntity<ErrorItem> handleAuthenticationException (AuthenticationException e) {
+        ErrorItem error = generateMessage(e, HttpStatus.UNAUTHORIZED);
+        return new ResponseEntity<>(error, HttpStatus.UNAUTHORIZED);
+    }
+
+    @ExceptionHandler({AccessDeniedException.class})
+    public ResponseEntity<ErrorItem> handleAccessDeniedException (AccessDeniedException e) {
+        ErrorItem error = generateMessage(e, HttpStatus.UNAUTHORIZED);
+        return new ResponseEntity<>(error, HttpStatus.UNAUTHORIZED);
+    }
+*/
+
+    /**
+     * Handles general JWT authentication failures (invalid/malformed tokens).
+     *
+     * @param e JwtException containing the authentication failure details
+     * @return ResponseEntity with ErrorItem containing error details and HTTP 401 status (UNAUTHORIZED)
+     */
+    @ExceptionHandler({JwtException.class})
+    public ResponseEntity<ErrorItem> handleJwtException(JwtException e) {
+        ErrorItem error = generateMessage(e, HttpStatus.UNAUTHORIZED);
+        return new ResponseEntity<>(error, HttpStatus.UNAUTHORIZED);
     }
 
     /**
