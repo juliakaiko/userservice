@@ -1,4 +1,4 @@
-name: CI Pipeline for Spring Boot WAR with Tomcat
+name: CI Pipeline for Spring Boot JAR
 
 on:
   push:
@@ -7,6 +7,10 @@ on:
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
+    services:
+      docker:
+        image: docker:dind
+        options: --privileged
 
     steps:
       - name: Checkout code
@@ -28,18 +32,16 @@ jobs:
           java-version: '21'
           distribution: 'temurin'
 
-      - name: Compile and test
+      - name: Build and test with Maven
         run: |
+          export MAVEN_OPTS="-Xmx2048m -XX:+HeapDumpOnOutOfMemoryError"
           mvn -B clean install
           pkill -f surefirebooter || true
 
-      - name: Build WAR
-        run: mvn -B package -DskipTests
-
       - name: Prepare for Sonar analysis
         run: |
-          mkdir -p target/unpacked-libs/WEB-INF/lib
-          unzip -q -j target/*.war 'WEB-INF/lib/*.jar' -d target/unpacked-libs/WEB-INF/lib || echo "No libraries found in WAR"
+          mkdir -p target/unpacked-libs
+          unzip -q -j target/*.jar 'BOOT-INF/lib/*.jar' -d target/unpacked-libs || echo "No libraries found in JAR"
 
       - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@v2
