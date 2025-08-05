@@ -7,7 +7,7 @@ import org.springframework.security.oauth2.jwt.JwtDecoder;
 
 @TestConfiguration
 public class JwtDecoderTestConfig {
-    @Bean
+    @Bean(name = "jwtDecoderTest")
     public JwtDecoder jwtDecoder() {
         return Mockito.mock(JwtDecoder.class);
     }
