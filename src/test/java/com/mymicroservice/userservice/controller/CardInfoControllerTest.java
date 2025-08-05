@@ -42,15 +42,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.mockito.Mockito.any;
 
 @WebMvcTest(controllers = CardInfoController.class)
-@ExtendWith(MockitoExtension.class)
 @AutoConfigureMockMvc(addFilters = true)
 @Import(SecurityConfig.class)
 @WithMockUser(roles = {"ADMIN", "USER"})
 @Slf4j
 public class CardInfoControllerTest {
-
-    @InjectMocks
-    private CardInfoController cardInfoController;
 
     @MockBean
     private CardInfoService cardInfoService;

@@ -45,14 +45,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(controllers = UserController.class)
-@ExtendWith(MockitoExtension.class)
 @AutoConfigureMockMvc(addFilters = true)
 @Import(SecurityConfig.class)
 @Slf4j
 public class UserControllerTest {
-
-    @InjectMocks
-    private UserController userController;
 
     @MockBean
     private UserService userService;
