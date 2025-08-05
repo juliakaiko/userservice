@@ -13,9 +13,6 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Page;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -42,7 +39,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.mockito.Mockito.any;
 
 @WebMvcTest(controllers = CardInfoController.class)
-@AutoConfigureMockMvc(addFilters = true)
+@AutoConfigureMockMvc(addFilters = false)
 @Import(SecurityConfig.class)
 @WithMockUser(roles = {"ADMIN", "USER"})
 @Slf4j
