@@ -10,7 +10,6 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 
 @SpringBootTest
 @ActiveProfiles("test")
-//@Import(TestContainersConfig.class)
 @Import({TestContainersConfig.class, JwtDecoderTestConfig.class})
 @Testcontainers(disabledWithoutDocker = true)
 class UserServiceApplicationTests extends TestContainersConfig{
