@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:pro="http://www.liquibase.org/xml/ns/pro"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.1.xsd
+            http://www.liquibase.org/xml/ns/pro
+            http://www.liquibase.org/xml/ns/pro/liquibase-pro-4.1.xsd">
+
+    <changeSet id="cards_fill_data" author="julia_kaiko">
+        <preConditions>
+            <tableExists tableName="card_info"/>
+        </preConditions>
+        <sql>
+            INSERT INTO card_info (number, holder, expiration_date, user_id) VALUES ('4111111111111111', 'Julia Kaiko', '2025-12-31', 1);
+            INSERT INTO card_info (number, holder, expiration_date, user_id) VALUES ('4111111111110000', 'Julia Kaiko', '2025-11-10', 1);
+            INSERT INTO card_info (number, holder, expiration_date, user_id) VALUES ('4111111111119999', 'Julia Kaiko', '2026-05-05', 1);
+            INSERT INTO card_info (number, holder, expiration_date, user_id) VALUES ('4222222222222222', 'Anna Smith', '2024-11-30', 2);
+            INSERT INTO card_info (number, holder, expiration_date, user_id) VALUES ('4333333333333333', 'Michael Johnson', '2026-03-31', 3);
+            INSERT INTO card_info (number, holder, expiration_date, user_id) VALUES ('4444444444444444', 'Emily Brown', '2025-08-31', 4);
+            INSERT INTO card_info (number, holder, expiration_date, user_id) VALUES ('4555555555555555', 'David Wilson', '2024-10-31', 5);
+            INSERT INTO card_info (number, holder, expiration_date, user_id) VALUES ('4666666666666666', 'Robert Miller', '2027-01-31', 6);
+            INSERT INTO card_info (number, holder, expiration_date, user_id) VALUES ('4777777777777777', 'Jennifer Taylor', '2025-05-31', 7);
+            INSERT INTO card_info (number, holder, expiration_date, user_id) VALUES ('4888888888888888', 'Thomas Anderson', '2026-07-31', 8);
+            INSERT INTO card_info (number, holder, expiration_date, user_id) VALUES ('4999999999999999', 'Lisa Martinez', '2024-09-30', 9);
+            INSERT INTO card_info (number, holder, expiration_date, user_id) VALUES ('4000111122223333', 'James Robinson', '2025-04-30', 10);
+            INSERT INTO card_info (number, holder, expiration_date, user_id) VALUES ('4111222233334444', 'Patricia Clark', '2026-02-28', 11);
+            INSERT INTO card_info (number, holder, expiration_date, user_id) VALUES ('4222333344445555', 'Daniel Rodriguez', '2027-06-30', 12);
+            INSERT INTO card_info (number, holder, expiration_date, user_id) VALUES ('4333444455556666', 'Nancy Lewis', '2025-09-30', 13);
+            INSERT INTO card_info (number, holder, expiration_date, user_id) VALUES ('4444555566667777', 'Matthew Walker', '2024-12-31', 14);
+            INSERT INTO card_info (number, holder, expiration_date, user_id) VALUES ('4555666677778888', 'Karen Hall', '2026-04-30', 15);
+            INSERT INTO card_info (number, holder, expiration_date, user_id) VALUES ('4666777788889999', 'Christopher Allen', '2027-08-31', 16);
+            INSERT INTO card_info (number, holder, expiration_date, user_id) VALUES ('4777888899990000', 'Betty Young', '2025-01-31', 17);
+            INSERT INTO card_info (number, holder, expiration_date, user_id) VALUES ('4888999900001111', 'Anthony King', '2026-05-31', 18);
+            INSERT INTO card_info (number, holder, expiration_date, user_id) VALUES ('4999000011112222', 'Margaret Wright', '2024-07-31', 19);
+        </sql>
+        <rollback>
+            DELETE FROM card_info WHERE id IN (1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21);
+        </rollback>
+    </changeSet>
+
+</databaseChangeLog>
