@@ -28,6 +28,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 @RestController
@@ -49,11 +50,12 @@ public class UserController {
     }
 
     @GetMapping("/hello")
-    public ResponseEntity<?> sayHello () {
+    public ResponseEntity<Map<String, String>> sayHello() {
         UserDto userDto = getAuthenticatedUser();
         String greeting = "Hello, " + userDto.getName() + " " + userDto.getSurname();
-        return ResponseEntity.ok(greeting);
+        return ResponseEntity.ok(Map.of("message", greeting));
     }
+
 
     @GetMapping("/{id}")
     public ResponseEntity<?> getUserById (@PathVariable("id") Long id) {

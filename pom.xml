@@ -142,7 +142,7 @@
 			<artifactId>lettuce-core</artifactId>
 			<!--<version>6.4.0.RELEASE</version>-->
 		</dependency>
-		<!-- Для серелизации в JSON LocalDate -->
+		<!-- For serelization LocalDate in JSON  -->
 		<dependency>
 			<groupId>com.fasterxml.jackson.datatype</groupId>
 			<artifactId>jackson-datatype-jsr310</artifactId>

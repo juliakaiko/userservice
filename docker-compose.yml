@@ -20,7 +20,7 @@ services:
       - SPRING_LIQUIBASE_USER=${DB_USER}
       - SPRING_LIQUIBASE_PASSWORD=${DB_PASSWORD}
       - SPRING_DATA_REDIS_HOST=${REDIS_HOST}
-      - SPRING_DATA_REDIS_PORT=6379
+      - SPRING_DATA_REDIS_PORT=${REDIS_PORT}
     networks:
       - myproject-network
 

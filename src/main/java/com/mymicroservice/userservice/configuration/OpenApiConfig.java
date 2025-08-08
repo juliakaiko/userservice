@@ -22,8 +22,8 @@ public class OpenApiConfig {
                         addList("Bearer Authentication"))
                 .components(new Components().addSecuritySchemes
                         ("Bearer Authentication", createAPIKeyScheme()))
-                .info(new Info().title("Authentication Service API")
-                        .description("Authentication Service for UserService"));
+                .info(new Info().title("User Service API")
+                        .description("Use JWT-token from Authentication Service to login"));
     }
 
     private SecurityScheme createAPIKeyScheme() {
@@ -31,13 +31,4 @@ public class OpenApiConfig {
                 .bearerFormat("JWT")
                 .scheme("bearer");
     }
-
-    /*@Bean
-    public OpenAPI api (){
-        return new OpenAPI().servers(
-                List.of(new Server().url("http://localhost:8080"))
-        ).info(
-                new Info().title("User Servise API")
-        );
-    }*/
 }
