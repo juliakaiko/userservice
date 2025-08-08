@@ -1,8 +1,6 @@
 target/
 .idea/
 !.mvn/wrapper/maven-wrapper.jar
-src/main/resources/keys/*.pem
-src/test/resources/keys/*.pem
 
 ### IntelliJ IDEA ###
 .idea/modules.xml
