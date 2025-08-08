@@ -6,6 +6,7 @@ WORKDIR /app
 COPY target/userservice-0.0.1-SNAPSHOT.jar app.jar
 
 COPY target/classes/keys /app/keys
+#COPY src/main/resources/keys /app/keys
 
 EXPOSE 8080
 

@@ -1,24 +1,16 @@
+target/*
+!target/userservice-0.0.1-SNAPSHOT.jar
+!target/classes/keys/**
+
 .idea/
 src/main/resources/keys/*.pem
 src/test/resources/keys/*.pem
 
-### IntelliJ IDEA ###
-.idea/modules.xml
-.idea/jarRepositories.xml
-.idea/compiler.xml
-.idea/libraries/
-*.iws
-*.iml
-*.ipr
-
-### STS ###
-.apt_generated
-.classpath
-.factorypath
-.project
-.settings
-.springBeans
-.sts4-cache
-
-### VS Code ###
+.git/
+.gitignore
+.idea/
 .vscode/
+*.iml
+*.iws
+*.ipr
+**/.DS_Store
