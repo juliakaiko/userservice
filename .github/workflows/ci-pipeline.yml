@@ -8,16 +8,27 @@ jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
     services:
+      postgres: # Required for Testcontainers and database tests
+        image: postgres:latest
+        env:
+          POSTGRES_USER: test
+          POSTGRES_PASSWORD: test
+          POSTGRES_DB: test
+        ports:
+          - 5432:5432
+        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
       docker:
         image: docker:dind
         options: --privileged
 
     steps:
+      # 1. Clone the repository
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0
+          fetch-depth: 0 # Fetch full commit history (needed for Sonar analysis and versioning)
 
+      # 2. Cache Maven dependencies (speeds up builds)
       - name: Cache Maven dependencies
         uses: actions/cache@v4
         with:
@@ -26,17 +37,34 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-maven-
 
+      # 3. Set up JDK 21 (change to 17 if your project requires it)
       - name: Set up JDK 21
         uses: actions/setup-java@v3
         with:
           java-version: '21'
           distribution: 'temurin'
 
-      - name: Build and test with Maven
+      # 4. Verify Docker is available (using GitHub Actions built-in Docker)
+      - name: Check Docker status
+        run: docker info
+
+      # 5. Wait for PostgreSQL to initialize
+      - name: Wait for PostgreSQL
+        run: sleep 10
+
+      # 6. Build and test with Maven + Testcontainers
+      - name: Build and test with Maven (Testcontainers)
+        env:
+          TESTCONTAINERS_RYUK_DISABLED: "true"      # Disable Ryuk for better stability
+          MAVEN_OPTS: "-Dmaven.repo.local=.m2"      # Use local Maven cache
+          SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/test
+          SPRING_DATASOURCE_USERNAME: test
+          SPRING_DATASOURCE_PASSWORD: test
         run: |
           mvn -B clean install -e -X -Dspring.test.constructor.autowire.mode=all
-          pkill -f surefirebooter || true
+          pkill -f surefirebooter || true           # Kill any stuck test processes
 
+      # 7. Upload test reports if tests fail
       - name: Upload Surefire Reports
         if: failure()
         uses: actions/upload-artifact@v4
@@ -44,11 +72,13 @@ jobs:
           name: surefire-reports
           path: target/surefire-reports/
 
+      # 8. Prepare JAR for SonarCloud analysis (extract dependencies)
       - name: Prepare for Sonar analysis
         run: |
           mkdir -p target/unpacked-libs
           unzip -q -j target/*.jar 'BOOT-INF/lib/*.jar' -d target/unpacked-libs || echo "No libraries found in JAR"
 
+      # 9. Static code analysis with SonarCloud
       - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@v2
         env:
@@ -62,12 +92,14 @@ jobs:
             -Dsonar.java.binaries=target/classes
             -Dsonar.java.libraries=target/unpacked-libs/*.jar
 
+      # 10. Log in to Docker Hub
       - name: Login to Docker Hub
         uses: docker/login-action@v2
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
+      # 11. Build and push Docker image (using local Docker socket)
       - name: Build and Push Docker Image
         if: success()
         run: |

@@ -9,10 +9,7 @@ import jakarta.validation.ConstraintViolationException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.AccessDeniedException;
-import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.security.authorization.AuthorizationDeniedException;
-import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -100,20 +97,6 @@ public class GlobalAdvice {
         ErrorItem error = generateMessage(e, HttpStatus.FORBIDDEN);
         return new ResponseEntity<>(error, HttpStatus.FORBIDDEN);
     }
-/*
-
-    @ExceptionHandler({AuthenticationException.class})
-    public ResponseEntity<ErrorItem> handleAuthenticationException (AuthenticationException e) {
-        ErrorItem error = generateMessage(e, HttpStatus.UNAUTHORIZED);
-        return new ResponseEntity<>(error, HttpStatus.UNAUTHORIZED);
-    }
-
-    @ExceptionHandler({AccessDeniedException.class})
-    public ResponseEntity<ErrorItem> handleAccessDeniedException (AccessDeniedException e) {
-        ErrorItem error = generateMessage(e, HttpStatus.UNAUTHORIZED);
-        return new ResponseEntity<>(error, HttpStatus.UNAUTHORIZED);
-    }
-*/
 
     /**
      * Handles general JWT authentication failures (invalid/malformed tokens).

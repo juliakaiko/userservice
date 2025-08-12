@@ -54,7 +54,7 @@ public class UserRepositoryTest extends TestContainersConfig {
     @Test
     void findByEmail_shouldReturnUserWhenExists() {
         Optional<User> actualUser = userRepository.findByEmailIgnoreCase(expectedUser.getEmail());
-        log.info("Test to find the User with email: {} "+expectedUser.getEmail());
+        log.info("Test to find the User with email: {} "+ expectedUser.getEmail());
 
         assertNotNull(actualUser.get());
         assertEquals(expectedUser, actualUser.get());

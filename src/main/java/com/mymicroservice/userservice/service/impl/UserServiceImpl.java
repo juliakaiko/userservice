@@ -60,10 +60,10 @@ public class UserServiceImpl implements UserService {
     @Transactional(readOnly = true)
     @Cacheable(value = "userCache", key = "#userId")
     public UserDto getUserById(Long userId) {
-        Optional<User> user = Optional.ofNullable(userRepository.findById(userId)
+        Optional<User> userFromDb = Optional.ofNullable(userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException("User wasn't found with id " + userId)));
         log.info("getUsersById(): {}",userId);
-        return UserMapper.INSTANSE.toDto(user.get());
+        return UserMapper.INSTANSE.toDto(userFromDb.get());
     }
 
     /**
@@ -106,11 +106,11 @@ public class UserServiceImpl implements UserService {
     @Transactional
     @CacheEvict(value = "userCache", key = "#userId") // delete from cache
     public UserDto deleteUser(Long userId) {
-        Optional<User> user = Optional.ofNullable(userRepository.findById(userId)
+        Optional<User> userFromDb = Optional.ofNullable(userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException("User wasn't found with id " + userId)));
         userRepository.deleteById(userId);
-        log.info("deleteUser(): {}",user);
-        return UserMapper.INSTANSE.toDto(user.get());
+        log.info("deleteUser(): {}",userFromDb);
+        return UserMapper.INSTANSE.toDto(userFromDb.get());
     }
 
     /**
@@ -123,10 +123,10 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional(readOnly = true)
     public UserDto getUsersByEmail(String email) {
-        Optional<User> user = Optional.ofNullable(userRepository.findByEmailIgnoreCase(email)
+        Optional<User> userFromDb = Optional.ofNullable(userRepository.findByEmailIgnoreCase(email)
                 .orElseThrow(() -> new UserNotFoundException("User wasn't found with email " + email)));
-        log.info("getUsersByEmail(): {}",user);
-        return UserMapper.INSTANSE.toDto(user.get());
+        log.info("getUsersByEmail(): {}",userFromDb);
+        return UserMapper.INSTANSE.toDto(userFromDb.get());
     }
 
     /**

@@ -86,6 +86,7 @@ public class CardInfoServiceImplTest {
 
         assertNotNull(result);
         assertEquals(testCardInfoDto, result);
+
         verify(cardInfoRepository, times(1)).findById(TEST_CARD_INFO_ID);
     }
 

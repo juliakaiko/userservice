@@ -49,7 +49,7 @@ public class CardInfoServiceImpl implements CardInfoService {
     @Transactional
     public CardInfoDto createCardInfo(@Valid CardInfoDto cardInfoDto) {
         CardInfo cardInfo = CardInfoMapper.INSTANSE.toEntity(cardInfoDto);
-        log.info("createCardInfo(): {}",cardInfo);
+        log.info("createCardInfo(): {}", cardInfo);
 
         if (cardInfoDto.getUserId() != null) {
             User user = userRepository.findById(cardInfoDto.getUserId())
@@ -74,10 +74,10 @@ public class CardInfoServiceImpl implements CardInfoService {
     @Transactional(readOnly = true)
     @Cacheable(key = "#cardId")
     public CardInfoDto getCardInfoById(Long cardId) {
-        Optional<CardInfo> cardInfo = Optional.ofNullable(cardInfoRepository.findById(cardId)
+        Optional<CardInfo> cardInfoFromDb = Optional.ofNullable(cardInfoRepository.findById(cardId)
                 .orElseThrow(() -> new CardInfoNotFoundException("CardInfo wasn't found with id " + cardId)));
-        log.info("getCardInfoById(): {}",cardId);
-        return  CardInfoMapper.INSTANSE.toDto(cardInfo.get());
+        log.info("getCardInfoById(): {}", cardId);
+        return  CardInfoMapper.INSTANSE.toDto(cardInfoFromDb.get());
     }
 
     /**
@@ -108,7 +108,7 @@ public class CardInfoServiceImpl implements CardInfoService {
         cardInfo.setNumber(cardInfoDto.getNumber());
         cardInfo.setHolder(cardInfoDto.getHolder());
         cardInfo.setExpirationDate(cardInfoDto.getExpirationDate());
-        log.info("updateCardInfo: {}",cardInfo);
+        log.info("updateCardInfo: {}", cardInfo);
         cardInfoRepository.save(cardInfo);
         return CardInfoMapper.INSTANSE.toDto(cardInfo);
     }
@@ -127,11 +127,11 @@ public class CardInfoServiceImpl implements CardInfoService {
     @Transactional
     @CacheEvict(key = "#cardId")
     public CardInfoDto deleteCardInfo(Long cardId) {
-        Optional<CardInfo> cardInfo = Optional.ofNullable(cardInfoRepository.findById(cardId)
+        Optional<CardInfo> cardInfoFromDb = Optional.ofNullable(cardInfoRepository.findById(cardId)
                 .orElseThrow(() -> new CardInfoNotFoundException("CardInfo wasn't found with id " + cardId)));
         cardInfoRepository.deleteById(cardId);
-        log.info("deleteCardInfo(): {}",cardInfo);
-        return CardInfoMapper.INSTANSE.toDto(cardInfo.get());
+        log.info("deleteCardInfo(): {}", cardInfoFromDb);
+        return CardInfoMapper.INSTANSE.toDto(cardInfoFromDb.get());
     }
 
     /**
@@ -146,7 +146,7 @@ public class CardInfoServiceImpl implements CardInfoService {
     public CardInfoDto getCardInfoByNumber(String number) {
         Optional<CardInfo> cardInfo = Optional.ofNullable(cardInfoRepository.findByNumber(number)
                 .orElseThrow(() -> new CardInfoNotFoundException("CardInfo wasn't found with number " + number)));
-        log.info("getCardInfoByNumber(): {}",number);
+        log.info("getCardInfoByNumber(): {}", number);
         return  CardInfoMapper.INSTANSE.toDto(cardInfo.get());
     }
 

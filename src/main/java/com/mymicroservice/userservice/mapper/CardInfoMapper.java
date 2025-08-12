@@ -17,9 +17,7 @@ public interface CardInfoMapper {
     @Mapping(target = "number", source = "cardInfo.number")
     @Mapping(target = "holder", source = "cardInfo.holder")
     @Mapping(target = "expirationDate", source = "cardInfo.expirationDate")
-    //@Mapping(target = "user", source = "cardInfo.userId")
-   // @Mapping(target = "user", ignore = true) // игнорируем объект User в DTO
-    @Mapping(target = "userId", source = "cardInfo.userId.userId") // берем ID из объекта User
+    @Mapping(target = "userId", source = "cardInfo.userId.userId") // take ID from User
     CardInfoDto toDto(CardInfo cardInfo);
 
     /**

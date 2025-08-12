@@ -54,7 +54,7 @@ public class User {
     @Column(name="password")
     private String password;
 
-    @Enumerated(EnumType.STRING) // поле типа enum должно быть сохранено в базе данных в виде строки
+    @Enumerated(EnumType.STRING) // enum type field must be stored in the database as a string
     @Column(name="role")
     private Role role;
 

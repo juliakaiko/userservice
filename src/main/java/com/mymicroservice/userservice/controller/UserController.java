@@ -56,10 +56,9 @@ public class UserController {
         return ResponseEntity.ok(Map.of("message", greeting));
     }
 
-
     @GetMapping("/{id}")
     public ResponseEntity<?> getUserById (@PathVariable("id") Long id) {
-        log.info("Request to find the User by id: {}",id);
+        log.info("Request to find the User by id: {}", id);
         UserDto userDto = userService.getUserById(id);
         return ObjectUtils.isEmpty(userDto)
                 ? ResponseEntity.notFound().build()
@@ -68,7 +67,7 @@ public class UserController {
 
     @GetMapping("/find-by-email") //http://localhost:8080/api/users/find-by-email?email=user1%40yandex.ru
     public ResponseEntity<?> getUserByEmail (@RequestParam String email) {
-        log.info("Request to find the User by email: {}",email);
+        log.info("Request to find the User by email: {}", email);
         UserDto userDto = userService.getUsersByEmail(email);
         return ObjectUtils.isEmpty(userDto)
                 ? ResponseEntity.notFound().build()
@@ -76,7 +75,7 @@ public class UserController {
     }
 
     @GetMapping("/find-by-ids") // /find-by-ids?ids=1&ids=2&ids=3
-    public ResponseEntity<List<UserDto>>  getUsersByIds(@RequestParam @NotEmpty Set<Long> ids) {
+    public ResponseEntity<List<UserDto>> getUsersByIds(@RequestParam @NotEmpty Set<Long> ids) {
         log.info("Request to find Users by IDs: {}", ids);
         List<UserDto> userDtos = userService.getUsersIdIn(ids);
         return ResponseEntity.ok(userDtos);
@@ -113,7 +112,7 @@ public class UserController {
 
     @PostMapping("/")
     public ResponseEntity<?> createUser (@RequestBody @Valid UserDto userDto){
-        log.info("Request to add new user: {}",userDto);
+        log.info("Request to add a new User: {}", userDto);
         UserDto savedUserDto =  userService.createUser(userDto);
         return ObjectUtils.isEmpty(savedUserDto)
                 ? ResponseEntity.notFound().build()
@@ -121,11 +120,11 @@ public class UserController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity <?> updateUser (@PathVariable("id") Long id,
-                                          @RequestBody @Valid UserDto userDto){
-        log.info("Request to update the User: {}",userDto);
+    public ResponseEntity<?> updateUser (@PathVariable("id") Long id,
+                                         @RequestBody @Valid UserDto userDto){
+        log.info("Request to update the User: {}", userDto);
 
-        UserDto savedUserDto =  userService.updateUser(id,userDto);
+        UserDto savedUserDto =  userService.updateUser(id, userDto);
 
         return ObjectUtils.isEmpty(savedUserDto)
                 ? ResponseEntity.notFound().build()
@@ -134,8 +133,8 @@ public class UserController {
 
     @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
-    public ResponseEntity <?> deleteUser (@PathVariable("id") Long id){
-        log.info("Request to delete the User by id: {}",id);
+    public ResponseEntity<?> deleteUser (@PathVariable("id") Long id){
+        log.info("Request to delete the User by id: {}", id);
 
         UserDto deletedUserDto = userService.deleteUser(id);
 
