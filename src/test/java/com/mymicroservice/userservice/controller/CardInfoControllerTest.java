@@ -18,7 +18,6 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.http.MediaType;
-import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -48,9 +47,6 @@ public class CardInfoControllerTest {
 
     @MockBean
     private CardInfoService cardInfoService;
-
-    @MockBean
-    private JwtDecoder jwtDecoder;
 
     @Autowired
     private MockMvc mockMvc;
@@ -204,7 +200,7 @@ public class CardInfoControllerTest {
     public void createCardInfo_ShouldReturnCreatedCardDto() throws Exception {
         when(cardInfoService.createCardInfo(any(CardInfoDto.class))).thenReturn(cardInfoDto);
 
-        mockMvc.perform(post("/api/cards/")
+        mockMvc.perform(post("/api/cards/add")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(cardInfoDto)))
                 .andExpect(status().isOk())

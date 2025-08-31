@@ -99,7 +99,7 @@ public class CardInfoController {
         return ResponseEntity.ok(cardInfoService.getAllCardInfosNativeWithPagination(page, size));
     }
 
-    @PostMapping("/")
+    @PostMapping("/add")
     public ResponseEntity<?> createCardInfo (@RequestBody @Valid CardInfoDto cardInfoDto){
         log.info("Request to add new CardInfo: {}", cardInfoDto);
         CardInfoDto savedCardInfoDto =  cardInfoService.createCardInfo(cardInfoDto);

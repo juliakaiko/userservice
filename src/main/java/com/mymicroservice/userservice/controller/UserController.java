@@ -110,15 +110,6 @@ public class UserController {
         return ResponseEntity.ok(userService.getAllUsersNativeWithPagination(page, size));
     }
 
-    @PostMapping("/")
-    public ResponseEntity<?> createUser (@RequestBody @Valid UserDto userDto){
-        log.info("Request to add a new User: {}", userDto);
-        UserDto savedUserDto =  userService.createUser(userDto);
-        return ObjectUtils.isEmpty(savedUserDto)
-                ? ResponseEntity.notFound().build()
-                : ResponseEntity.ok(savedUserDto);
-    }
-
     @PutMapping("/{id}")
     public ResponseEntity<?> updateUser (@PathVariable("id") Long id,
                                          @RequestBody @Valid UserDto userDto){

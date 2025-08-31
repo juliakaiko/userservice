@@ -21,7 +21,6 @@ import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.http.MediaType;
-import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.test.context.support.WithMockUser;
 
 import org.springframework.test.web.servlet.MockMvc;
@@ -50,9 +49,6 @@ public class UserControllerTest {
 
     @MockBean
     private UserService userService;
-
-    @MockBean
-    private JwtDecoder jwtDecoder;
 
     @Autowired
     private MockMvc mockMvc;
@@ -222,21 +218,6 @@ public class UserControllerTest {
 
     @Test
     @WithMockUser(username = "test@test.by", roles = {"USER"})
-    public void createUser_ShouldReturnCreatedUserDto() throws Exception {
-        when(userService.createUser(any(UserDto.class))).thenReturn(userDto);
-
-        mockMvc.perform(post("/api/users/")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(userDto)))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.userId").value(USER_ID))
-                .andExpect(jsonPath("$.email").value(USER_EMAIL));
-
-        verify(userService).createUser(any(UserDto.class));
-    }
-
-    @Test
-    @WithMockUser(username = "test@test.by", roles = {"USER"})
     public void updateUser_ShouldReturnUpdatedUserDto() throws Exception {
         UserDto responseDto = UserMapper.INSTANSE.toDto(UserGenerator.generateUser());
         responseDto.setUserId(1l);
@@ -280,7 +261,7 @@ public class UserControllerTest {
     }
 
     @Test
-    @WithMockUser(username = "admin@test.by", roles = {"ADMIN"})
+    @WithMockUser(username = "admin@test.by", authorities = {"ROLE_ADMIN"} )
     public void deleteUser_ShouldReturnDeletedUserDto() throws Exception {
         when(userService.deleteUser(USER_ID)).thenReturn(userDto);
 
@@ -292,7 +273,7 @@ public class UserControllerTest {
     }
 
     @Test
-    @WithMockUser(username = "admin@test.by", roles = {"ADMIN"})
+    @WithMockUser(username = "admin@test.by", authorities = {"ROLE_ADMIN"} )
     public void deleteUser_ShouldReturnNotFound() throws Exception {
         when(userService.deleteUser(USER_ID)).thenReturn(null);
 
