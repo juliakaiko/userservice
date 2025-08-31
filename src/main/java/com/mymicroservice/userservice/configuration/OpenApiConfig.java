@@ -23,7 +23,7 @@ public class OpenApiConfig {
                 .components(new Components().addSecuritySchemes
                         ("Bearer Authentication", createAPIKeyScheme()))
                 .info(new Info().title("User Service API")
-                        .description("Use JWT-token from Authentication Service to login"));
+                        .description("Use JWT-token to login"));
     }
 
     private SecurityScheme createAPIKeyScheme() {

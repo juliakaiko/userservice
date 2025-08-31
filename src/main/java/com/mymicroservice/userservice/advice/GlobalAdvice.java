@@ -9,6 +9,7 @@ import jakarta.validation.ConstraintViolationException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -96,6 +97,30 @@ public class GlobalAdvice {
     public ResponseEntity<ErrorItem> handleAuthorizationDeniedException(AuthorizationDeniedException e) {
         ErrorItem error = generateMessage(e, HttpStatus.FORBIDDEN);
         return new ResponseEntity<>(error, HttpStatus.FORBIDDEN);
+    }
+
+    /**
+     * Handles {@link HttpMessageNotReadableException} which occurs when HTTP request body
+     * cannot be properly parsed or converted to the expected Java object.
+     *
+     * <p>This typically happens when:
+     * <ul>
+     *   <li>Malformed JSON syntax in request body</li>
+     *   <li>Type mismatch between JSON values and target Java types</li>
+     *   <li>Invalid enum values that cannot be converted to the target enum type</li>
+     *   <li>Missing required fields in JSON payload</li>
+     * </ul>
+     *
+     * @param e the HttpMessageNotReadableException that was thrown during request processing
+     * @return ResponseEntity containing ErrorItem with details about the parsing error
+     * @see org.springframework.http.converter.HttpMessageNotReadableException
+     * @see org.springframework.http.HttpStatus#BAD_REQUEST
+     * @since 1.0
+     */
+    @ExceptionHandler({HttpMessageNotReadableException.class})
+    public ResponseEntity<ErrorItem> handleHttpMessageNotReadableException(HttpMessageNotReadableException e) {
+        ErrorItem error = generateMessage(e, HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
     }
 
     /**
