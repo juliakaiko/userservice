@@ -34,9 +34,9 @@ public class SecurityConfig {
                                 "/swagger-ui.html",
                                 "/swagger-ui/**",
                                 "/swagger-resources/**",
-                                "/v3/api-docs/**"
+                                "/v3/api-docs/**",
+                                "/api/internal/**" //An internal call
                         ).permitAll()
-                        .requestMatchers("/api/internal/**").hasRole("SERVICE") //An internal call from Gateway
                         .requestMatchers("/api/**").authenticated()
                         .anyRequest().authenticated()
                 )

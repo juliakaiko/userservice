@@ -19,7 +19,6 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -115,11 +114,11 @@ public class UserController {
                                          @RequestBody @Valid UserDto userDto){
         log.info("Request to update the User: {}", userDto);
 
-        UserDto savedUserDto =  userService.updateUser(id, userDto);
+        UserDto updatedUserDto =  userService.updateUser(id, userDto);
 
-        return ObjectUtils.isEmpty(savedUserDto)
+        return ObjectUtils.isEmpty(updatedUserDto)
                 ? ResponseEntity.notFound().build()
-                : ResponseEntity.ok(savedUserDto);
+                : ResponseEntity.ok(updatedUserDto);
     }
 
     @PreAuthorize("hasRole('ADMIN')")

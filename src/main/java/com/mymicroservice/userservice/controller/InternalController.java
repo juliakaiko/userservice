@@ -10,10 +10,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -44,5 +46,23 @@ public class InternalController {
         return ObjectUtils.isEmpty(deletedUserDto)
                 ? ResponseEntity.notFound().build()
                 : ResponseEntity.ok(deletedUserDto);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<?> getUserById (@PathVariable("id") Long id) {
+        log.info("Request to find the User by id: {}", id);
+        UserDto userDto = userService.getUserById(id);
+        return ObjectUtils.isEmpty(userDto)
+                ? ResponseEntity.notFound().build()
+                : ResponseEntity.ok(userDto);
+    }
+
+    @GetMapping("/find-by-email")
+    public ResponseEntity<?> getUserByEmail (@RequestParam String email) {
+        log.info("Request to find the User by email: {}", email);
+        UserDto userDto = userService.getUsersByEmail(email);
+        return ObjectUtils.isEmpty(userDto)
+                ? ResponseEntity.notFound().build()
+                : ResponseEntity.ok(userDto);
     }
 }

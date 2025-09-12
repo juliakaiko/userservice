@@ -44,7 +44,7 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public UserDto createUser(UserDto userDto) {
         User user = UserMapper.INSTANSE.toEntity(userDto);
-        log.info("createUser(): {}",user);
+        log.info("createUser(): {}", user);
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         user = userRepository.save(user);
         return UserMapper.INSTANSE.toDto(user);
@@ -65,7 +65,7 @@ public class UserServiceImpl implements UserService {
     public UserDto getUserById(Long userId) {
         Optional<User> userFromDb = Optional.ofNullable(userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException("User wasn't found with id " + userId)));
-        log.info("getUsersById(): {}",userId);
+        log.info("getUsersById(): {}", userId);
         return UserMapper.INSTANSE.toDto(userFromDb.get());
     }
 
@@ -92,7 +92,7 @@ public class UserServiceImpl implements UserService {
         user.setEmail(userDetails.getEmail());
         user.setPassword(userDetails.getPassword());
         user.setRole(userDetails.getRole());
-        log.info("updateUser(): {}",user);
+        log.info("updateUser(): {}", user);
         userRepository.save(user);
         return UserMapper.INSTANSE.toDto(user);
     }
@@ -112,7 +112,7 @@ public class UserServiceImpl implements UserService {
         Optional<User> userFromDb = Optional.ofNullable(userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException("User wasn't found with id " + userId)));
         userRepository.deleteById(userId);
-        log.info("deleteUser(): {}",userFromDb);
+        log.info("deleteUser(): {}", userFromDb);
         return UserMapper.INSTANSE.toDto(userFromDb.get());
     }
 
@@ -128,7 +128,7 @@ public class UserServiceImpl implements UserService {
     public UserDto getUsersByEmail(String email) {
         Optional<User> userFromDb = Optional.ofNullable(userRepository.findByEmailIgnoreCase(email)
                 .orElseThrow(() -> new UserNotFoundException("User wasn't found with email " + email)));
-        log.info("getUsersByEmail(): {}",userFromDb);
+        log.info("getUsersByEmail(): {}", userFromDb);
         return UserMapper.INSTANSE.toDto(userFromDb.get());
     }
 
@@ -156,7 +156,7 @@ public class UserServiceImpl implements UserService {
     @Transactional(readOnly = true)
     public List<UserDto> getUsersByRole(Role role) {
         List <User> userList = userRepository.findUsersByRole(role);
-        log.info("getUsersByRole(): {}",role);
+        log.info("getUsersByRole(): {}", role);
         return userList.stream().map(UserMapper.INSTANSE::toDto).toList();
     }
 
@@ -170,7 +170,7 @@ public class UserServiceImpl implements UserService {
     @Transactional(readOnly = true)
     public List<UserDto> getUsersBornAfter(LocalDate date) {
         List <User> userList = userRepository.findUsersBornAfter(date);
-        log.info("getUsersBornAfter(): {}",date);
+        log.info("getUsersBornAfter(): {}", date);
         return userList.stream().map(UserMapper.INSTANSE::toDto).toList();
     }
 

@@ -17,12 +17,14 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -92,4 +94,49 @@ public class InternalControllerTest {
 
         verify(userService).deleteUser(USER_ID);
     }
+
+    @Test
+    public void getUserById_ShouldReturnUserDto() throws Exception {
+        when(userService.getUserById(USER_ID)).thenReturn(userDto);
+
+        mockMvc.perform(get("/api/internal/users/{id}", USER_ID))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.userId").value(USER_ID));
+
+        verify(userService).getUserById(USER_ID);
+    }
+
+    @Test
+    public void getUserById_ShouldReturnNotFound() throws Exception {
+        when(userService.getUserById(USER_ID)).thenReturn(null);
+
+        mockMvc.perform(get("/api/internal/users/{id}", USER_ID))
+                .andExpect(status().isNotFound());
+
+        verify(userService).getUserById(USER_ID);
+    }
+
+    @Test
+    public void getUserByEmail_ShouldReturnUserDto() throws Exception {
+        when(userService.getUsersByEmail(USER_EMAIL)).thenReturn(userDto);
+
+        mockMvc.perform(get("/api/internal/users/find-by-email")
+                        .param("email", USER_EMAIL))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.email").value(USER_EMAIL));
+
+        verify(userService).getUsersByEmail(USER_EMAIL);
+    }
+
+    @Test
+    public void getUserByEmail_ShouldReturnNotFound() throws Exception {
+        when(userService.getUsersByEmail(USER_EMAIL)).thenReturn(null);
+
+        mockMvc.perform(get("/api/internal/users/find-by-email")
+                        .param("email", USER_EMAIL))
+                .andExpect(status().isNotFound());
+
+        verify(userService).getUsersByEmail(USER_EMAIL);
+    }
+
 }
