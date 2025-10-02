@@ -19,6 +19,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Page;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -28,6 +29,7 @@ import java.util.Set;
 import static org.junit.Assert.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -43,6 +45,9 @@ public class UserServiceImplTest {
     @Mock
     private UserRepository userRepository;
 
+    @Mock
+    private PasswordEncoder passwordEncoder;
+
     private final Long TEST_USER_ID = 1L;
     private final String TEST_EMAIL = "test@test.by";
     private User testUser;
@@ -57,14 +62,20 @@ public class UserServiceImplTest {
 
     @Test
     public void createUser_whenCorrect_thenReturnUserDto() {
-        User mappedUser = UserMapper.INSTANSE.toEntity(testUserDto);
-        when(userRepository.save(mappedUser)).thenReturn(testUser);
+        when(passwordEncoder.encode(anyString())).thenAnswer(invocation -> "encoded_" + invocation.getArgument(0));
+
+        String newPass = "encoded_" + testUser.getPassword();
+        testUser.setPassword(newPass);
+
+        when(userRepository.save(any(User.class))).thenReturn(testUser);
 
         UserDto result = userService.createUser(testUserDto);
 
         assertNotNull(result);
-        assertEquals(testUserDto, result);
+        assertEquals(TEST_USER_ID, result.getUserId());
+        assertEquals("encoded_" + testUserDto.getPassword(), result.getPassword());
 
+        verify(passwordEncoder, times(1)).encode(testUserDto.getPassword());
         verify(userRepository, times(1)).save(any(User.class));
     }
 
