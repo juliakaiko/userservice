@@ -2,7 +2,9 @@ name: CI Pipeline for Spring Boot JAR
 
 on:
   push:
-    branches: [ branch1 ]
+    branches:
+      - branch1
+      - main
 
 jobs:
   build-and-deploy:

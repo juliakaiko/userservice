@@ -31,6 +31,7 @@ public class SecurityConfig {
                 .addFilterBefore(gatewayAuthFilter, UsernamePasswordAuthenticationFilter.class)
                 .authorizeHttpRequests(authz -> authz
                         .requestMatchers(
+                                "/actuator/**",
                                 "/swagger-ui.html",
                                 "/swagger-ui/**",
                                 "/swagger-resources/**",

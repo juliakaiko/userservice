@@ -51,7 +51,7 @@ public class InternalControllerTest {
     @BeforeEach
     void setUp() {
         User user  = UserGenerator.generateUser();
-        user.setUserId(1l);
+        user.setUserId(USER_ID);
         userDto = UserMapper.INSTANSE.toDto(user);
         disableAnnotationsInObjectMapper();
     }
@@ -60,11 +60,13 @@ public class InternalControllerTest {
         objectMapper.disable(MapperFeature.USE_ANNOTATIONS); // Disable @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     }
 
+    // ------------------- CREATE USER -------------------
     @Test
-    public void createUser_ShouldReturnCreatedUserDto() throws Exception {
+    public void createUser_ShouldReturnCreatedUserDto_WhenHeaderIsTrue() throws Exception {
         when(userService.createUser(any(UserDto.class))).thenReturn(userDto);
 
         mockMvc.perform(post("/api/internal/users/")
+                        .header("X-Internal-Call", "true")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(userDto)))
                 .andExpect(status().isOk())
@@ -75,10 +77,29 @@ public class InternalControllerTest {
     }
 
     @Test
-    public void deleteUser_ShouldReturnDeletedUserDto() throws Exception {
+    public void createUser_ShouldReturnForbidden_WhenHeaderMissing() throws Exception {
+        mockMvc.perform(post("/api/internal/users/")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(userDto)))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    public void createUser_ShouldReturnForbidden_WhenHeaderIsFalse() throws Exception {
+        mockMvc.perform(post("/api/internal/users/")
+                        .header("X-Internal-Call", "false")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(userDto)))
+                .andExpect(status().isForbidden());
+    }
+
+    // ------------------- DELETE USER -------------------
+    @Test
+    public void deleteUser_ShouldReturnDeletedUserDto_WhenHeaderIsTrue() throws Exception {
         when(userService.deleteUser(USER_ID)).thenReturn(userDto);
 
-        mockMvc.perform(delete("/api/internal/users/{id}", USER_ID))
+        mockMvc.perform(delete("/api/internal/users/{id}", USER_ID)
+                        .header("X-Internal-Call", "true"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.userId").value(USER_ID));
 
@@ -86,20 +107,36 @@ public class InternalControllerTest {
     }
 
     @Test
-    public void deleteUser_ShouldReturnNotFound() throws Exception {
+    public void deleteUser_ShouldReturnNotFound_WhenUserNotFound() throws Exception {
         when(userService.deleteUser(USER_ID)).thenReturn(null);
 
-        mockMvc.perform(delete("/api/internal/users/{id}", USER_ID))
+        mockMvc.perform(delete("/api/internal/users/{id}", USER_ID)
+                        .header("X-Internal-Call", "true"))
                 .andExpect(status().isNotFound());
 
         verify(userService).deleteUser(USER_ID);
     }
 
     @Test
-    public void getUserById_ShouldReturnUserDto() throws Exception {
+    public void deleteUser_ShouldReturnForbidden_WhenHeaderMissing() throws Exception {
+        mockMvc.perform(delete("/api/internal/users/{id}", USER_ID))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    public void deleteUser_ShouldReturnForbidden_WhenHeaderIsFalse() throws Exception {
+        mockMvc.perform(delete("/api/internal/users/{id}", USER_ID)
+                        .header("X-Internal-Call", "false"))
+                .andExpect(status().isForbidden());
+    }
+
+    // ------------------- GET USER BY ID -------------------
+    @Test
+    public void getUserById_ShouldReturnUserDto_WhenHeaderIsTrue() throws Exception {
         when(userService.getUserById(USER_ID)).thenReturn(userDto);
 
-        mockMvc.perform(get("/api/internal/users/{id}", USER_ID))
+        mockMvc.perform(get("/api/internal/users/{id}", USER_ID)
+                        .header("X-Internal-Call", "true"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.userId").value(USER_ID));
 
@@ -107,20 +144,36 @@ public class InternalControllerTest {
     }
 
     @Test
-    public void getUserById_ShouldReturnNotFound() throws Exception {
+    public void getUserById_ShouldReturnNotFound_WhenUserNotFound() throws Exception {
         when(userService.getUserById(USER_ID)).thenReturn(null);
 
-        mockMvc.perform(get("/api/internal/users/{id}", USER_ID))
+        mockMvc.perform(get("/api/internal/users/{id}", USER_ID)
+                        .header("X-Internal-Call", "true"))
                 .andExpect(status().isNotFound());
 
         verify(userService).getUserById(USER_ID);
     }
 
     @Test
-    public void getUserByEmail_ShouldReturnUserDto() throws Exception {
+    public void getUserById_ShouldReturnForbidden_WhenHeaderMissing() throws Exception {
+        mockMvc.perform(get("/api/internal/users/{id}", USER_ID))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    public void getUserById_ShouldReturnForbidden_WhenHeaderIsFalse() throws Exception {
+        mockMvc.perform(get("/api/internal/users/{id}", USER_ID)
+                        .header("X-Internal-Call", "false"))
+                .andExpect(status().isForbidden());
+    }
+
+    // ------------------- GET USER BY EMAIL -------------------
+    @Test
+    public void getUserByEmail_ShouldReturnUserDto_WhenHeaderIsTrue() throws Exception {
         when(userService.getUsersByEmail(USER_EMAIL)).thenReturn(userDto);
 
         mockMvc.perform(get("/api/internal/users/find-by-email")
+                        .header("X-Internal-Call", "true")
                         .param("email", USER_EMAIL))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.email").value(USER_EMAIL));
@@ -129,14 +182,31 @@ public class InternalControllerTest {
     }
 
     @Test
-    public void getUserByEmail_ShouldReturnNotFound() throws Exception {
+    public void getUserByEmail_ShouldReturnNotFound_WhenUserNotFound() throws Exception {
         when(userService.getUsersByEmail(USER_EMAIL)).thenReturn(null);
 
         mockMvc.perform(get("/api/internal/users/find-by-email")
+                        .header("X-Internal-Call", "true")
                         .param("email", USER_EMAIL))
                 .andExpect(status().isNotFound());
 
         verify(userService).getUsersByEmail(USER_EMAIL);
     }
+
+    @Test
+    public void getUserByEmail_ShouldReturnForbidden_WhenHeaderMissing() throws Exception {
+        mockMvc.perform(get("/api/internal/users/find-by-email")
+                        .param("email", USER_EMAIL))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    public void getUserByEmail_ShouldReturnForbidden_WhenHeaderIsFalse() throws Exception {
+        mockMvc.perform(get("/api/internal/users/find-by-email")
+                        .header("X-Internal-Call", "false")
+                        .param("email", USER_EMAIL))
+                .andExpect(status().isForbidden());
+    }
+
 
 }
