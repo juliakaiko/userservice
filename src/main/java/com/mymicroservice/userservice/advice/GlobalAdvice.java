@@ -18,36 +18,45 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @RestControllerAdvice(annotations = GlobalExceptionHandler.class)
 public class GlobalAdvice {
 
     /**
-     * Handles validation exceptions for DTO fields when data fails validation annotations
-     * such as @Valid, @NotNull, @Size, @Pattern and others.
+     * Handles validation exceptions for DTO fields when controller method parameters
+     * annotated with @Valid fail validation, such as @NotNull, @NotBlank, @Size, @Email, etc.
      *
-     * @param e MethodArgumentNotValidException containing validation error information
-     * @return ResponseEntity with an ErrorItem object containing:
-     *         - List of error messages
-     *         - URL
-     *         - Status code
-     *         - Timestamp
-     *         - HTTP 400 status (BAD_REQUEST)
+     * <p>This method extracts field-specific error messages and returns them
+     * in the `fieldErrors` map, where keys are field names and values are messages.
+     * It also returns a general message, timestamp, URL, and HTTP 400 status code.
+     *
+     * @param e the MethodArgumentNotValidException containing validation error information
+     * @return ResponseEntity containing an ErrorItem object with:
+     *         - general message ("Validation failed")
+     *         - map of fieldErrors (field name → validation message)
+     *         - timestamp
+     *         - request URL
+     *         - HTTP 400 status code (BAD_REQUEST)
      */
     @ExceptionHandler({MethodArgumentNotValidException.class})
     public ResponseEntity<ErrorItem> handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
         ErrorItem error = new ErrorItem();
-        String errors = e.getBindingResult()
-                .getFieldErrors()
-                .stream()
-                .map(x -> x.getDefaultMessage())
-                .collect(Collectors.toList())
-                .toString();
-        error.setMessage(errors);
+
+        Map<String, String> fieldErrors = e.getFieldErrors().stream()
+                .collect(Collectors.toMap(
+                        x -> x.getField(),
+                        x -> x.getDefaultMessage(),
+                        (msg1, msg2) -> msg1 + "; " + msg2
+                ));
+
+        error.setFieldErrors(fieldErrors);
+        error.setMessage("Validation failed");
         error.setTimestamp(formatDate());
         error.setUrl(ServletUriComponentsBuilder.fromCurrentRequestUri().toUriString());
         error.setStatusCode(HttpStatus.BAD_REQUEST.value());
+
         return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
     }
 

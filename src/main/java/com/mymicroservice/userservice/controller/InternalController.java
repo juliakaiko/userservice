@@ -78,7 +78,7 @@ public class InternalController {
     }
 
     @GetMapping("/find-by-email")
-    public ResponseEntity<?> getUserByEmail (@RequestParam String email,
+    public ResponseEntity<?> getUserByEmail (@RequestParam("email")  String email,
                                              @RequestHeader(value = "X-Internal-Call", required = false) String internalCall) {
         log.info("Request to find the User by email: {}", email);
 

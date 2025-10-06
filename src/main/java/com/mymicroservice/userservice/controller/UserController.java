@@ -51,7 +51,7 @@ public class UserController {
     @GetMapping("/hello")
     public ResponseEntity<Map<String, String>> sayHello() {
         UserDto userDto = getAuthenticatedUser();
-        String greeting = "Hello, " + userDto.getName() + " " + userDto.getSurname();
+        String greeting = "Welcome, " + userDto.getName() + " " + userDto.getSurname();
         return ResponseEntity.ok(Map.of("message", greeting));
     }
 
@@ -65,7 +65,7 @@ public class UserController {
     }
 
     @GetMapping("/find-by-email") //http://localhost:8080/api/users/find-by-email?email=user1%40yandex.ru
-    public ResponseEntity<?> getUserByEmail (@RequestParam String email) {
+    public ResponseEntity<?> getUserByEmail (@RequestParam("email") String email) {
         log.info("Request to find the User by email: {}", email);
         UserDto userDto = userService.getUsersByEmail(email);
         return ObjectUtils.isEmpty(userDto)
