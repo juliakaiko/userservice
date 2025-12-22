@@ -175,6 +175,12 @@
 			<version>2.17.0</version> <!-- Compatible version with Spring Boot 3.3.4 -->
 		</dependency>
 
+        <dependency>
+            <groupId>net.logstash.logback</groupId>
+            <artifactId>logstash-logback-encoder</artifactId>
+            <version>7.4</version>
+        </dependency>
+
 		<!-- JWT -->
 		<dependency>
 			<groupId>io.jsonwebtoken</groupId>

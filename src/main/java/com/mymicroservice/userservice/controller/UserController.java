@@ -9,6 +9,8 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -50,6 +52,7 @@ public class UserController {
 
     @GetMapping("/hello")
     public ResponseEntity<Map<String, String>> sayHello() {
+        log.info("Request to welcome the User ");
         UserDto userDto = getAuthenticatedUser();
         String greeting = "Welcome, " + userDto.getName() + " " + userDto.getSurname();
         return ResponseEntity.ok(Map.of("message", greeting));

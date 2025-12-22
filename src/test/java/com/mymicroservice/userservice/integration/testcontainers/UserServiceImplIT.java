@@ -33,7 +33,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 @SpringBootTest
 @ActiveProfiles("test")
 @Transactional
-public class UserServiceImplIT extends TestContainersConfig  {
+public class UserServiceImplIT extends TestContainersConfig {
 
     @Autowired
     private UserServiceImpl userService;

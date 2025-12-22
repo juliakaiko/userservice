@@ -8,6 +8,8 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.ObjectUtils;
@@ -52,6 +54,7 @@ public class CardInfoController {
     @GetMapping("/{id}")
     public ResponseEntity<?> getCardInfoById (@PathVariable("id") Long id) {
         log.info("Request to find the CardInfo by id: {}", id);
+
         CardInfoDto cardInfoDto = cardInfoService.getCardInfoById(id);
         return ObjectUtils.isEmpty(cardInfoDto)
                 ? ResponseEntity.notFound().build()
@@ -61,6 +64,7 @@ public class CardInfoController {
     @GetMapping("/find-by-number") //http://localhost:8080/api/cards/find_by_number?number=4111111111119999
     public ResponseEntity<?> getCardInfoByNumber (@RequestParam String number) {
         log.info("Request to find the CardInfo by number: {}", number);
+
         CardInfoDto cardInfoDto = cardInfoService.getCardInfoByNumber(number);
         return ObjectUtils.isEmpty(cardInfoDto)
                 ? ResponseEntity.notFound().build()
@@ -70,24 +74,28 @@ public class CardInfoController {
     @GetMapping("/find-by-ids") // /find-by-ids?ids=1&ids=2&ids=3
     public ResponseEntity<List<CardInfoDto>> getCardInfoByIds(@RequestParam @NotEmpty Set<Long> ids) {
         log.info("Request to find CardInfos by IDs: {}", ids);
+
         return ResponseEntity.ok(cardInfoService.getCardInfoIdIn(ids));
     }
 
     @GetMapping("/user/{user_id}")
     public ResponseEntity<List<CardInfoDto>> getCardInfoByUserId(@PathVariable("user_id") Long user_id) {
         log.info("Request to find CardInfos by userId: {}", user_id);
+
         return ResponseEntity.ok(cardInfoService.getByUserId(user_id));
     }
 
     @GetMapping("/expired")
     public ResponseEntity<List<CardInfoDto>> getExpiredCards() {
         log.info("Request to find expired CardInfos");
+
         return ResponseEntity.ok(cardInfoService.getExpiredCards());
     }
 
     @GetMapping("/all")
     public ResponseEntity<List<CardInfoDto>> getAllCardInfos() {
         log.info("Request to find all CardInfos");
+
         return ResponseEntity.ok(cardInfoService.getAllCardInfos());
     }
 
@@ -96,12 +104,14 @@ public class CardInfoController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
         log.info("Request to find all CardInfos with pagination");
+
         return ResponseEntity.ok(cardInfoService.getAllCardInfosNativeWithPagination(page, size));
     }
 
     @PostMapping("/add")
     public ResponseEntity<?> createCardInfo (@RequestBody @Valid CardInfoDto cardInfoDto){
         log.info("Request to add new CardInfo: {}", cardInfoDto);
+
         CardInfoDto savedCardInfoDto =  cardInfoService.createCardInfo(cardInfoDto);
         return ObjectUtils.isEmpty(savedCardInfoDto)
                 ? ResponseEntity.notFound().build()
