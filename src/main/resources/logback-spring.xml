@@ -36,15 +36,20 @@
     </appender>
 
     <!-- Логгер для трассировки -->
-    <logger name="TRACE_MDC_LOGGER" level="INFO" additivity="false">
+    <!-- В файл trace-mdc.log  добавлятся только MDC логи / additivity="true" — логи также пойдут в корневой логгер (в консоль)-->
+    <logger name="com.mymicroservice" level="INFO" additivity="true">
         <appender-ref ref="TRACE_MDC"/>
     </logger>
+    <!--<logger name="TRACE_MDC_LOGGER" level="INFO" additivity="false">
+        <appender-ref ref="TRACE_MDC"/>
+    </logger>-->
 
     <!-- Корневой логгер -->
     <root level="INFO">
         <!-- Сохраняем вывод в консоль -->
         <appender-ref ref="CONSOLE"/>
-        <!-- Добавляем вывод в trace-mdc.log через TRACE_MDC -->
+
+        <!-- ВСЕ логи уровня INFO добавятся в trace-mdc.log: попадёт всё, включая логи Spring Boot, Hibernate и т.д. -->
         <!--<appender-ref ref="TRACE_MDC"/>-->
     </root>
 

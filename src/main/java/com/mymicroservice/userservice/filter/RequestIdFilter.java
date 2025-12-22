@@ -4,8 +4,7 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -15,11 +14,11 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Component
+@Slf4j
 public class RequestIdFilter extends OncePerRequestFilter {
 
     private static final String REQUEST_ID = "requestId";
-    // Логгер для MDC
-    private static final Logger TRACE_MDC_LOGGER = LoggerFactory.getLogger("TRACE_MDC_LOGGER");
+    private static final String SERVICE_NAME = "userservice";
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
@@ -32,21 +31,21 @@ public class RequestIdFilter extends OncePerRequestFilter {
 
         // 2. Кладём в MDC
         MDC.put(REQUEST_ID, requestId);
-        MDC.put("serviceName", "userservice");
+        MDC.put("serviceName", SERVICE_NAME);
 
         // 3. Добавляем заголовок в ответ
         response.setHeader("X-Request-Id", requestId);
 
-        // Логируем ВХОДЯЩИЙ запрос (один раз!)
-        TRACE_MDC_LOGGER.info("{} {}",
+        // Пишем в файл трассировки лог в начале запроса
+        log.info("{} {}",
                 request.getMethod(),
                 request.getRequestURI());
         try {
             // 4. Продолжаем фильтры
             filterChain.doFilter(request, response);
         } finally {
-            // Логируем ИСХОДЯЩИЙ ответ
-            TRACE_MDC_LOGGER.info("Response status: {}", response.getStatus());
+            // Пишем в файл трассировки лог в конце запроса
+            log.info("Response status: {}", response.getStatus());
 
             // 6. Очищаем MDC
             MDC.clear();

@@ -9,8 +9,6 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -54,7 +52,7 @@ public class UserController {
     public ResponseEntity<Map<String, String>> sayHello() {
         log.info("Request to welcome the User ");
         UserDto userDto = getAuthenticatedUser();
-        String greeting = "Welcome, " + userDto.getName() + " " + userDto.getSurname();
+        String greeting = "Hello, " + userDto.getName() + " " + userDto.getSurname();
         return ResponseEntity.ok(Map.of("message", greeting));
     }
 
@@ -68,7 +66,7 @@ public class UserController {
     }
 
     @GetMapping("/find-by-email") //http://localhost:8080/api/users/find-by-email?email=user1%40yandex.ru
-    public ResponseEntity<?> getUserByEmail (@RequestParam("email") String email) {
+    public ResponseEntity<?> getUserByEmail (@RequestParam String email) {
         log.info("Request to find the User by email: {}", email);
         UserDto userDto = userService.getUsersByEmail(email);
         return ObjectUtils.isEmpty(userDto)
