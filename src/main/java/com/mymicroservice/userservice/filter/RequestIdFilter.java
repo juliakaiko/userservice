@@ -44,7 +44,7 @@ public class RequestIdFilter extends OncePerRequestFilter {
             // 4. Продолжаем фильтры
             filterChain.doFilter(request, response);
         } finally {
-            // Пишем в файл трассировки лог в конце запроса
+            // Пишем в файл трассировки лог при RESPONSE
             log.info("Response status: {}", response.getStatus());
 
             // 6. Очищаем MDC

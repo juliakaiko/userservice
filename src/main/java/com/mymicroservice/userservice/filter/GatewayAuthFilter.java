@@ -28,6 +28,12 @@ public class GatewayAuthFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
+        String path = request.getRequestURI();
+
+        if (path.startsWith("/actuator")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
 
         try {
             if (isGatewayCall(request)) {
@@ -35,7 +41,7 @@ public class GatewayAuthFilter extends OncePerRequestFilter {
                 parseJwtAndAuthenticate(request);
             } else {
                 SecurityContextHolder.clearContext();
-                log.debug("Internal service-to-service call detected, no authentication required");
+                log.info("Internal service-to-service call detected, no authentication required");
             }
         } catch (Exception e) {
             SecurityContextHolder.clearContext();

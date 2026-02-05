@@ -3,6 +3,8 @@
 
     <property name="LOG_PATH" value="${user.dir}/logs"/>
 
+    <springProperty scope="context" name="SERVICE_NAME" source="spring.application.name" defaultValue="unknown-service"/>
+
     <!-- Консольный лог -->
     <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
@@ -12,9 +14,12 @@
 
     <!-- Файловый JSON-лог с кастомной структурой -->
     <appender name="TRACE_MDC" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>${LOG_PATH}/trace-mdc.log</file>
+        <!-- Текущий активный файл -->
+        <file>${LOG_PATH}/${SERVICE_NAME}.log</file>
+
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <fileNamePattern>${LOG_PATH}/trace-mdc.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <!-- Архивные файлы -->
+            <fileNamePattern>${LOG_PATH}/${SERVICE_NAME}_%d{dd-MM-yyyy}.log</fileNamePattern>
             <maxHistory>14</maxHistory>
         </rollingPolicy>
 
