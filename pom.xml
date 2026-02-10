@@ -30,6 +30,11 @@
 		<sonar.projectKey>juliakaiko_userservice</sonar.projectKey>
 		<sonar.host.url>https://sonarcloud.io</sonar.host.url>
 		<sonar.java.binaries>target/classes</sonar.java.binaries>
+        <jackson-databind.version>2.17.0</jackson-databind.version>
+        <logstash-logback-encoder.version>7.4</logstash-logback-encoder.version>
+        <postgresql.version>42.7.4</postgresql.version>
+        <testcontainers-redis.version>2.2.2</testcontainers-redis.version>
+        <spring-security-test.version>6.5.2</spring-security-test.version>
 	</properties>
 
 	<dependencies>
@@ -53,6 +58,10 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-security</artifactId>
 		</dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
 		<!-- Spring Security + JWT (OAuth2 Resource Server) -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -111,7 +120,7 @@
 		<dependency>
 			<groupId>com.redis</groupId>
 			<artifactId>testcontainers-redis</artifactId>
-			<version>2.2.2</version>
+            <version>${testcontainers-redis.version}</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
@@ -124,11 +133,11 @@
 		<dependency>
 			<groupId>org.postgresql</groupId>
 			<artifactId>postgresql</artifactId>
-			<version>42.7.4</version>
+            <version>${postgresql.version}</version>
 			<scope>runtime</scope>
 		</dependency>
 
-		<!-- Redis+Cahce -->
+		<!-- Redis+Cache -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-data-redis</artifactId>
@@ -172,8 +181,14 @@
 		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>
 			<artifactId>jackson-databind</artifactId>
-			<version>2.17.0</version> <!-- Compatible version with Spring Boot 3.3.4 -->
+            <version>${jackson-databind.version}</version> <!-- Compatible version with Spring Boot 3.3.4 -->
 		</dependency>
+
+        <dependency>
+            <groupId>net.logstash.logback</groupId>
+            <artifactId>logstash-logback-encoder</artifactId>
+            <version>${logstash-logback-encoder.version}</version>
+        </dependency>
 
 		<!-- JWT -->
 		<dependency>
@@ -193,10 +208,11 @@
 			<version>${jjwt.version}</version>
 			<scope>runtime</scope>
 		</dependency>
+
         <dependency>
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-test</artifactId>
-            <version>6.5.2</version>
+            <version>${spring-security-test.version}</version>
             <scope>test</scope>
         </dependency>
 

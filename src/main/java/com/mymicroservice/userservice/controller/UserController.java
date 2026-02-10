@@ -47,9 +47,18 @@ public class UserController {
         UserDto userDto = userService.getUsersByEmail(currentPrincipalName);
         return userDto;
     }
+//http://localhost:8083/api/users/proxy-type
+    @GetMapping("/proxy-type")
+    public String checkProxy() {
+        Class<?> clazz = userService.getClass();
+        System.out.println("Класс бина: " + clazz.getName());
+        System.out.println("Суперкласс: " + clazz.getSuperclass().getName());
+        return clazz.getName();
+    }
 
     @GetMapping("/hello")
     public ResponseEntity<Map<String, String>> sayHello() {
+        log.info("Request to welcome the User ");
         UserDto userDto = getAuthenticatedUser();
         String greeting = "Hello, " + userDto.getName() + " " + userDto.getSurname();
         return ResponseEntity.ok(Map.of("message", greeting));
