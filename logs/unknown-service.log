@@ -1,0 +1,87 @@
+{"@timestamp":"2026-02-10T13:29:25.6732055+03:00","thread_name":"main","message":"Starting CardInfoControllerTest using Java 21.0.6 with PID 30920 (started by pugac in D:\\Julia\\INNOWICE\\rootproject\\userservice)"}
+{"@timestamp":"2026-02-10T13:29:25.6843568+03:00","thread_name":"main","message":"The following 1 profile is active: \"test\""}
+{"@timestamp":"2026-02-10T13:29:30.5443081+03:00","thread_name":"main","message":"Started CardInfoControllerTest in 5.783 seconds (process running for 7.451)"}
+{"@timestamp":"2026-02-10T13:29:30.7741119+03:00","thread_name":"main","message":"Request to find CardInfos by userId: 1"}
+{"@timestamp":"2026-02-10T13:29:31.0056854+03:00","thread_name":"main","message":"Request to delete the CardInfo by id: 1"}
+{"@timestamp":"2026-02-10T13:29:31.0313349+03:00","thread_name":"main","message":"Request to find the CardInfo by number: 1111222233334444"}
+{"@timestamp":"2026-02-10T13:29:31.0438583+03:00","thread_name":"main","message":"Request to find all CardInfos"}
+{"@timestamp":"2026-02-10T13:29:31.0595506+03:00","thread_name":"main","message":"Request to find the CardInfo by number: 1111222233334444"}
+{"@timestamp":"2026-02-10T13:29:31.0756781+03:00","thread_name":"main","message":"Request to find the CardInfo by id: 1"}
+{"@timestamp":"2026-02-10T13:29:31.1888267+03:00","thread_name":"main","message":"Request to update the CardInfo: CardInfoDto(cardId=1, number=1111222233334444, holder=TestUser, expirationDate=2030-03-03, userId=null)"}
+{"@timestamp":"2026-02-10T13:29:31.2024297+03:00","thread_name":"main","message":"Request to delete the CardInfo by id: 1"}
+{"@timestamp":"2026-02-10T13:29:31.218975+03:00","thread_name":"main","message":"Request to find expired CardInfos"}
+{"@timestamp":"2026-02-10T13:29:31.2305398+03:00","thread_name":"main","message":"Request to update the CardInfo: CardInfoDto(cardId=1, number=1111222233334444, holder=TestUser, expirationDate=2030-03-03, userId=null)"}
+{"@timestamp":"2026-02-10T13:29:31.2450895+03:00","thread_name":"main","message":"Request to find all CardInfos with pagination"}
+{"@timestamp":"2026-02-10T13:29:31.2696447+03:00","thread_name":"main","message":"Request to find CardInfos by IDs: [1, 2, 3]"}
+{"@timestamp":"2026-02-10T13:29:31.2832378+03:00","thread_name":"main","message":"Request to add new CardInfo: CardInfoDto(cardId=1, number=1111222233334444, holder=TestUser, expirationDate=2030-03-03, userId=null)"}
+{"@timestamp":"2026-02-10T13:29:31.2933194+03:00","thread_name":"main","message":"Request to find the CardInfo by id: 1"}
+{"@timestamp":"2026-02-10T13:29:31.3810159+03:00","thread_name":"main","message":"Starting InternalControllerTest using Java 21.0.6 with PID 30920 (started by pugac in D:\\Julia\\INNOWICE\\rootproject\\userservice)"}
+{"@timestamp":"2026-02-10T13:29:31.3810159+03:00","thread_name":"main","message":"The following 1 profile is active: \"test\""}
+{"@timestamp":"2026-02-10T13:29:31.9854892+03:00","thread_name":"main","message":"Started InternalControllerTest in 0.643 seconds (process running for 8.892)"}
+{"@timestamp":"2026-02-10T13:29:32.001021+03:00","thread_name":"main","message":"Request to find the User by id: 1"}
+{"@timestamp":"2026-02-10T13:29:32.0105577+03:00","thread_name":"main","message":"Request to find the User by email: test@test.by"}
+{"@timestamp":"2026-02-10T13:29:32.0191006+03:00","thread_name":"main","message":"Request to find the User by id: 1"}
+{"@timestamp":"2026-02-10T13:29:32.0737734+03:00","thread_name":"main","message":"Request to add a new User: UserDto(userId=1, name=TestName, surname=TestSurName, birthDate=2000-02-02, email=test@test.by, password=pass_test, role=USER)"}
+{"@timestamp":"2026-02-10T13:29:32.0823173+03:00","thread_name":"main","message":"Request to find the User by id: 1"}
+{"@timestamp":"2026-02-10T13:29:32.0893176+03:00","thread_name":"main","message":"Request to find the User by email: test@test.by"}
+{"@timestamp":"2026-02-10T13:29:32.0988492+03:00","thread_name":"main","message":"Request to add a new User: UserDto(userId=1, name=TestName, surname=TestSurName, birthDate=2000-02-02, email=test@test.by, password=pass_test, role=USER)"}
+{"@timestamp":"2026-02-10T13:29:32.1073661+03:00","thread_name":"main","message":"Request to find the User by email: test@test.by"}
+{"@timestamp":"2026-02-10T13:29:32.1149012+03:00","thread_name":"main","message":"Request to add a new User: UserDto(userId=1, name=TestName, surname=TestSurName, birthDate=2000-02-02, email=test@test.by, password=pass_test, role=USER)"}
+{"@timestamp":"2026-02-10T13:29:32.1243802+03:00","thread_name":"main","message":"Request to delete the User by id: 1"}
+{"@timestamp":"2026-02-10T13:29:32.1328873+03:00","thread_name":"main","message":"Request to find the User by id: 1"}
+{"@timestamp":"2026-02-10T13:29:32.1408952+03:00","thread_name":"main","message":"Request to delete the User by id: 1"}
+{"@timestamp":"2026-02-10T13:29:32.1474184+03:00","thread_name":"main","message":"Request to find the User by email: test@test.by"}
+{"@timestamp":"2026-02-10T13:29:32.1551367+03:00","thread_name":"main","message":"Request to delete the User by id: 1"}
+{"@timestamp":"2026-02-10T13:29:32.1611489+03:00","thread_name":"main","message":"Request to delete the User by id: 1"}
+{"@timestamp":"2026-02-10T13:29:32.2221622+03:00","thread_name":"main","message":"Starting UserControllerTest using Java 21.0.6 with PID 30920 (started by pugac in D:\\Julia\\INNOWICE\\rootproject\\userservice)"}
+{"@timestamp":"2026-02-10T13:29:32.2231612+03:00","thread_name":"main","message":"The following 1 profile is active: \"test\""}
+{"@timestamp":"2026-02-10T13:29:32.6443225+03:00","thread_name":"main","message":"Started UserControllerTest in 0.445 seconds (process running for 9.551)"}
+{"@timestamp":"2026-02-10T13:29:32.6920696+03:00","thread_name":"main","message":"Request to delete the User by id: 1"}
+{"@timestamp":"2026-02-10T13:29:32.7128268+03:00","thread_name":"main","message":"Request to update the User: UserDto(userId=1, name=TestName, surname=TestSurName, birthDate=2000-02-02, email=updated_email@test.by, password=pass_test, role=USER)"}
+{"@timestamp":"2026-02-10T13:29:32.7287908+03:00","thread_name":"main","message":"Request to find all Users"}
+{"@timestamp":"2026-02-10T13:29:32.7418462+03:00","thread_name":"main","message":"Request to find Users born after: 1990-01-01"}
+{"@timestamp":"2026-02-10T13:29:32.7513741+03:00","thread_name":"main","message":"Request to find the User by email: test@test.by"}
+{"@timestamp":"2026-02-10T13:29:32.7664086+03:00","thread_name":"main","message":"Request to find the User by id: 1"}
+{"@timestamp":"2026-02-10T13:29:32.7749544+03:00","thread_name":"main","message":"Request to find Users by role: USER"}
+{"@timestamp":"2026-02-10T13:29:32.7836603+03:00","thread_name":"main","message":"Request to find the User by email: test@test.by"}
+{"@timestamp":"2026-02-10T13:29:32.7941724+03:00","thread_name":"main","message":"Request to find Users by IDs: [1, 2, 3]"}
+{"@timestamp":"2026-02-10T13:29:32.8027556+03:00","thread_name":"main","message":"Request to find the User by id: 1"}
+{"@timestamp":"2026-02-10T13:29:32.8126686+03:00","thread_name":"main","message":"Request to update the User: UserDto(userId=1, name=TestName, surname=TestSurName, birthDate=2000-02-02, email=test@test.by, password=pass_test, role=USER)"}
+{"@timestamp":"2026-02-10T13:29:32.8210153+03:00","thread_name":"main","message":"Request to delete the User by id: 1"}
+{"@timestamp":"2026-02-10T13:29:32.8275589+03:00","thread_name":"main","message":"Request to find all Users with pagination"}
+{"@timestamp":"2026-02-10T13:29:38.8131859+03:00","thread_name":"main","message":"PostgreSQL JDBC URL: jdbc:postgresql://localhost:56828/test?loggerLevel=OFF"}
+{"@timestamp":"2026-02-10T13:29:38.8131859+03:00","thread_name":"main","message":"Redis Host: localhost, Port: 56830"}
+{"@timestamp":"2026-02-10T13:29:38.8833995+03:00","thread_name":"main","message":"PostgreSQL URL: jdbc:postgresql://localhost:56828/test?loggerLevel=OFF"}
+{"@timestamp":"2026-02-10T13:29:38.8869352+03:00","thread_name":"main","message":"Starting CardInfoRepositoryTest using Java 21.0.6 with PID 30920 (started by pugac in D:\\Julia\\INNOWICE\\rootproject\\userservice)"}
+{"@timestamp":"2026-02-10T13:29:38.8879423+03:00","thread_name":"main","message":"The following 1 profile is active: \"test\""}
+{"@timestamp":"2026-02-10T13:29:42.189411+03:00","thread_name":"main","message":"Started CardInfoRepositoryTest in 3.334 seconds (process running for 19.096)"}
+{"@timestamp":"2026-02-10T13:29:42.5881549+03:00","thread_name":"main","message":"Test to find the CardInfo with number: {} 1111222233334444"}
+{"@timestamp":"2026-02-10T13:29:46.6339175+03:00","thread_name":"main","message":"PostgreSQL URL: jdbc:postgresql://localhost:63729/test?loggerLevel=OFF"}
+{"@timestamp":"2026-02-10T13:29:46.6349257+03:00","thread_name":"main","message":"Starting UserRepositoryTest using Java 21.0.6 with PID 30920 (started by pugac in D:\\Julia\\INNOWICE\\rootproject\\userservice)"}
+{"@timestamp":"2026-02-10T13:29:46.6349257+03:00","thread_name":"main","message":"The following 1 profile is active: \"test\""}
+{"@timestamp":"2026-02-10T13:29:48.0751506+03:00","thread_name":"main","message":"Started UserRepositoryTest in 1.459 seconds (process running for 24.982)"}
+{"@timestamp":"2026-02-10T13:29:48.0972619+03:00","thread_name":"main","message":"Test to find the User with email: {} test@test.by"}
+{"@timestamp":"2026-02-10T13:29:49.6388136+03:00","thread_name":"main","message":"getExpiredCards()"}
+{"@timestamp":"2026-02-10T13:29:49.663504+03:00","thread_name":"main","message":"getCardInfoById(): 1"}
+{"@timestamp":"2026-02-10T13:29:49.6729793+03:00","thread_name":"main","message":"getCardInfoIdIn()"}
+{"@timestamp":"2026-02-10T13:29:49.6810214+03:00","thread_name":"main","message":"deleteCardInfo(): Optional[CardInfo(cardId=null, number=1111222233334444, holder=TestUser, expirationDate=2030-03-03)]"}
+{"@timestamp":"2026-02-10T13:29:49.7088931+03:00","thread_name":"main","message":"getByUserId()"}
+{"@timestamp":"2026-02-10T13:29:49.7269396+03:00","thread_name":"main","message":"updateCardInfo: CardInfo(cardId=null, number=1111222233334444, holder=New Holder, expirationDate=null)"}
+{"@timestamp":"2026-02-10T13:29:49.736247+03:00","thread_name":"main","message":"getByUserId()"}
+{"@timestamp":"2026-02-10T13:29:49.7508309+03:00","thread_name":"main","message":"createCardInfo(): CardInfo(cardId=null, number=1111222233334444, holder=TestUser, expirationDate=2030-03-03)"}
+{"@timestamp":"2026-02-10T13:29:49.7691273+03:00","thread_name":"main","message":"getAllCardInfosNativeWithPagination()"}
+{"@timestamp":"2026-02-10T13:29:49.7752493+03:00","thread_name":"main","message":"getCardInfoByNumber(): 1111222233334444"}
+{"@timestamp":"2026-02-10T13:29:49.7815113+03:00","thread_name":"main","message":"getAllCardInfos()"}
+{"@timestamp":"2026-02-10T13:29:49.8629031+03:00","thread_name":"main","message":"getAllUsers()"}
+{"@timestamp":"2026-02-10T13:29:49.8677557+03:00","thread_name":"main","message":"createUser(): User(userId=1, name=TestName, surname=TestSurName, birthDate=2000-02-02, email=test@test.by, password=pass_test, role=USER)"}
+{"@timestamp":"2026-02-10T13:29:49.8729739+03:00","thread_name":"main","message":"getUsersIdIn()"}
+{"@timestamp":"2026-02-10T13:29:49.8775018+03:00","thread_name":"main","message":"getUsersByRole(): USER"}
+{"@timestamp":"2026-02-10T13:29:49.8804941+03:00","thread_name":"main","message":"getUsersBornAfter(): 1999-02-02"}
+{"@timestamp":"2026-02-10T13:29:49.8912233+03:00","thread_name":"main","message":"getUsersById(): 1"}
+{"@timestamp":"2026-02-10T13:29:49.8932198+03:00","thread_name":"main","message":"findAllUsersNativeWithPagination()"}
+{"@timestamp":"2026-02-10T13:29:49.8977454+03:00","thread_name":"main","message":"deleteUser(): Optional[User(userId=1, name=TestName, surname=TestSurName, birthDate=2000-02-02, email=test@test.by, password=pass_test, role=USER)]"}
+{"@timestamp":"2026-02-10T13:29:49.9002569+03:00","thread_name":"main","message":"getUsersByEmail(): Optional[User(userId=1, name=TestName, surname=TestSurName, birthDate=2000-02-02, email=test@test.by, password=pass_test, role=USER)]"}
+{"@timestamp":"2026-02-10T13:29:49.9050158+03:00","thread_name":"main","message":"updateUser(): User(userId=1, name=New Name, surname=null, birthDate=null, email=new@email.com, password=null, role=null)"}
+{"@timestamp":"2026-02-10T13:29:52.7619907+03:00","thread_name":"main","message":"PostgreSQL URL: jdbc:postgresql://localhost:59697/test?loggerLevel=OFF"}
+{"@timestamp":"2026-02-10T13:29:52.7629933+03:00","thread_name":"main","message":"Starting UserServiceApplicationTests using Java 21.0.6 with PID 30920 (started by pugac in D:\\Julia\\INNOWICE\\rootproject\\userservice)"}
+{"@timestamp":"2026-02-10T13:29:52.7629933+03:00","thread_name":"main","message":"The following 1 profile is active: \"test\""}
