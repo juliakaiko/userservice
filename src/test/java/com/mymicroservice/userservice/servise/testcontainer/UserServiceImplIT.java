@@ -1,4 +1,4 @@
-package com.mymicroservice.userservice.integration.testcontainers;
+package com.mymicroservice.userservice.servise.testcontainer;
 
 import com.mymicroservice.userservice.configuration.TestContainersConfig;
 import com.mymicroservice.userservice.dto.UserDto;
