@@ -1,8 +1,9 @@
-package com.mymicroservice.userservice.repository;
+package com.mymicroservice.userservice.repository.testcontainer;
 
 import com.mymicroservice.userservice.configuration.TestContainersConfig;
 import com.mymicroservice.userservice.model.Role;
 import com.mymicroservice.userservice.model.User;
+import com.mymicroservice.userservice.repository.UserRepository;
 import com.mymicroservice.userservice.util.UserGenerator;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import lombok.extern.slf4j.Slf4j;

@@ -1,8 +1,10 @@
-package com.mymicroservice.userservice.repository;
+package com.mymicroservice.userservice.repository.testcontainer;
 
 import com.mymicroservice.userservice.configuration.TestContainersConfig;
 import com.mymicroservice.userservice.model.CardInfo;
 import com.mymicroservice.userservice.model.User;
+import com.mymicroservice.userservice.repository.CardInfoRepository;
+import com.mymicroservice.userservice.repository.UserRepository;
 import com.mymicroservice.userservice.util.CardInfoGenerator;
 import com.mymicroservice.userservice.util.UserGenerator;
 import lombok.extern.slf4j.Slf4j;
