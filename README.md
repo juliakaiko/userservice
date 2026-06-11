@@ -35,5 +35,6 @@ This project follows a layered architecture:
 
 ## 📩 Contacts
 **Author:** Yuliya Kaiko
-**Email:** yuliya.kaiko@innowise.com
+**Email:** pugaculia94@gmail.com
+
 

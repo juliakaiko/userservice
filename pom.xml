@@ -35,7 +35,7 @@
         <postgresql.version>42.7.4</postgresql.version>
         <testcontainers-redis.version>2.2.2</testcontainers-redis.version>
         <spring-security-test.version>6.5.2</spring-security-test.version>
-        <common-filters-starter.version>1.0.0</common-filters-starter.version>
+        <common-filters-starter.version>1.0.1</common-filters-starter.version>
 	</properties>
 
     <repositories>

@@ -116,5 +116,8 @@ jobs:
       - name: Build and Push Docker Image
         if: success()
         run: |
-          docker build -t juliakaiko94/user-service:latest .
-          docker push juliakaiko94/user-service:latest
+          docker build \
+            --build-arg GITHUB_USERNAME=${{ github.actor }} \
+            --build-arg GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }} \
+            -t juliakaiko94/paymentservice:latest .
+          docker push juliakaiko94/paymentservice:latest

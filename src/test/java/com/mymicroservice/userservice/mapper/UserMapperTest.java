@@ -1,6 +1,5 @@
 package com.mymicroservice.userservice.mapper;
 
-
 import com.mymicroservice.userservice.dto.UserDto;
 import com.mymicroservice.userservice.model.User;
 import com.mymicroservice.userservice.util.UserGenerator;
