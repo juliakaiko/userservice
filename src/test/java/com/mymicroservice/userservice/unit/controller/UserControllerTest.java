@@ -1,16 +1,14 @@
-package com.mymicroservice.userservice.controller;
+package com.mymicroservice.userservice.unit.controller;
 
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mymicroservice.userservice.configuration.SecurityConfig;
+import com.mymicroservice.userservice.controller.UserController;
 import com.mymicroservice.userservice.dto.UserDto;
 import com.mymicroservice.userservice.exception.UserNotFoundException;
-import com.mymicroservice.userservice.mapper.UserMapper;
 import com.mymicroservice.userservice.model.Role;
-import com.mymicroservice.userservice.model.User;
 import com.mymicroservice.userservice.service.UserService;
-import com.mymicroservice.userservice.util.UserGenerator;
-import lombok.extern.slf4j.Slf4j;
+import com.mymicroservice.userservice.util.UserDtoGenerator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,21 +20,28 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
-
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.LongStream;
 
+import static com.mymicroservice.userservice.util.data.TestConstants.ADMIN_USER_EMAIL;
+import static com.mymicroservice.userservice.util.data.TestConstants.BORN_AFTER_QUERY_DATE;
+import static com.mymicroservice.userservice.util.data.TestConstants.DEFAULT_PAGE;
+import static com.mymicroservice.userservice.util.data.TestConstants.DEFAULT_PAGE_SIZE;
+import static com.mymicroservice.userservice.util.data.TestConstants.PAGINATION_PAGE_SIZE;
+import static com.mymicroservice.userservice.util.data.TestConstants.SECOND_ENTITY_ID;
+import static com.mymicroservice.userservice.util.data.TestConstants.THIRD_ENTITY_ID;
+import static com.mymicroservice.userservice.util.data.TestConstants.UPDATED_USER_EMAIL;
+import static com.mymicroservice.userservice.util.data.TestConstants.USER_EMAIL;
+import static com.mymicroservice.userservice.util.data.TestConstants.USER_ID;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -44,8 +49,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(controllers = UserController.class)
 @AutoConfigureMockMvc(addFilters = false)
 @Import(SecurityConfig.class)
-@Slf4j
-public class UserControllerTest {
+class UserControllerTest {
 
     @MockBean
     private UserService userService;
@@ -56,25 +60,21 @@ public class UserControllerTest {
     @Autowired
     private ObjectMapper objectMapper;
 
-    private final static Long USER_ID = 1L;
-    private final static String USER_EMAIL = "test@test.by";
     private UserDto userDto;
 
     @BeforeEach
     void setUp() {
-        User user  = UserGenerator.generateUser();
-        user.setUserId(1l);
-        userDto = UserMapper.INSTANSE.toDto(user);
+        userDto = UserDtoGenerator.generateUserDtoWithId();
         disableAnnotationsInObjectMapper();
     }
 
     private void disableAnnotationsInObjectMapper() {
-        objectMapper.disable(MapperFeature.USE_ANNOTATIONS); // Disable @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+        objectMapper.disable(MapperFeature.USE_ANNOTATIONS);
     }
 
     @Test
-    @WithMockUser(username = "test@test.by", roles = {"USER"})
-    public void getUserById_ShouldReturnUserDto() throws Exception {
+    @WithMockUser(username = USER_EMAIL, roles = {"USER"})
+    void getUserById_ShouldReturnUserDto_WhenUserExists() throws Exception {
         when(userService.getUserById(USER_ID)).thenReturn(userDto);
 
         mockMvc.perform(get("/api/users/{id}", USER_ID))
@@ -85,8 +85,8 @@ public class UserControllerTest {
     }
 
     @Test
-    @WithMockUser(username = "test@test.by", roles = {"USER"})
-    public void getUserById_ShouldReturnNotFound() throws Exception {
+    @WithMockUser(username = USER_EMAIL, roles = {"USER"})
+    void getUserById_ShouldReturnNotFound_WhenUserNotFound() throws Exception {
         when(userService.getUserById(USER_ID)).thenReturn(null);
 
         mockMvc.perform(get("/api/users/{id}", USER_ID))
@@ -96,8 +96,8 @@ public class UserControllerTest {
     }
 
     @Test
-    @WithMockUser(username = "test@test.by", roles = {"USER"})
-    public void getUserByEmail_ShouldReturnUserDto() throws Exception {
+    @WithMockUser(username = USER_EMAIL, roles = {"USER"})
+    void getUserByEmail_ShouldReturnUserDto_WhenUserExists() throws Exception {
         when(userService.getUsersByEmail(USER_EMAIL)).thenReturn(userDto);
 
         mockMvc.perform(get("/api/users/find-by-email")
@@ -109,8 +109,8 @@ public class UserControllerTest {
     }
 
     @Test
-    @WithMockUser(username = "test@test.by", roles = {"USER"})
-    public void getUserByEmail_ShouldReturnNotFound() throws Exception {
+    @WithMockUser(username = USER_EMAIL, roles = {"USER"})
+    void getUserByEmail_ShouldReturnNotFound_WhenUserNotFound() throws Exception {
         when(userService.getUsersByEmail(USER_EMAIL)).thenReturn(null);
 
         mockMvc.perform(get("/api/users/find-by-email")
@@ -121,25 +121,28 @@ public class UserControllerTest {
     }
 
     @Test
-    @WithMockUser(username = "test@test.by", roles = {"USER"})
-    public void getUsersByIds_ShouldReturnList() throws Exception {
-        List<UserDto> userDtos = List.of(new UserDto(), new UserDto());
-        Set<Long> ids = Set.of(1L, 2L, 3L);
+    @WithMockUser(username = USER_EMAIL, roles = {"USER"})
+    void getUsersByIds_ShouldReturnList_WhenUsersExist() throws Exception {
+        List<UserDto> userDtos = List.of(
+                UserDtoGenerator.generateUserDtoForBatch(1),
+                UserDtoGenerator.generateUserDtoForBatch(2)
+        );
+        Set<Long> ids = Set.of(USER_ID, SECOND_ENTITY_ID, THIRD_ENTITY_ID);
 
         when(userService.getUsersIdIn(ids)).thenReturn(userDtos);
 
         mockMvc.perform(get("/api/users/find-by-ids")
-                        .param("ids", "1", "2", "3"))
+                        .param("ids", USER_ID.toString(), SECOND_ENTITY_ID.toString(), THIRD_ENTITY_ID.toString()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray())
-                .andExpect(jsonPath("$.length()").value(2));
+                .andExpect(jsonPath("$.length()").value(PAGINATION_PAGE_SIZE));
 
-        verify(userService).getUsersIdIn(Set.of(1L, 2L, 3L));
+        verify(userService).getUsersIdIn(Set.of(USER_ID, SECOND_ENTITY_ID, THIRD_ENTITY_ID));
     }
 
     @Test
-    @WithMockUser(username = "test@test.by", roles = {"USER"})
-    public void getUserByRole_ShouldReturnList() throws Exception {
+    @WithMockUser(username = USER_EMAIL, roles = {"USER"})
+    void getUserByRole_ShouldReturnList_WhenUsersExist() throws Exception {
         List<UserDto> userDtos = List.of(userDto);
 
         when(userService.getUsersByRole(Role.USER)).thenReturn(userDtos);
@@ -154,39 +157,26 @@ public class UserControllerTest {
     }
 
     @Test
-    @WithMockUser(username = "test@test.by", roles = {"USER"})
-    public void getUsersBornAfter_ShouldReturnList() throws Exception {
-        when(userService.createUser(any(UserDto.class)))  // Mock for createUser()
-                .thenAnswer(invocation -> invocation.getArgument(0));
+    @WithMockUser(username = USER_EMAIL, roles = {"USER"})
+    void getUsersBornAfter_ShouldReturnList_WhenUsersExist() throws Exception {
+        List<UserDto> users = LongStream.rangeClosed(USER_ID, THIRD_ENTITY_ID)
+                .mapToObj(UserDtoGenerator::generateUserDtoForBatch)
+                .collect(Collectors.toList());
 
-        List<UserDto> users = LongStream.range(1, 4) // stream:  1,2,3
-                .mapToObj(i -> userService.createUser(
-                        UserDto.builder()
-                                .userId(i)
-                                .name("User" + i)
-                                .surname("Surname" + i)
-                                .birthDate(LocalDate.of((int) (2000+i), 1, 1))
-                                .email("user" + i + "@example.com")
-                                .password("pass" + i)
-                                .role(Role.USER)
-                                .build()
-                )).collect(Collectors.toList());
-
-        LocalDate testDate = LocalDate.of(1990, 1, 1);
-        when(userService.getUsersBornAfter(testDate)).thenReturn(users);
+        when(userService.getUsersBornAfter(BORN_AFTER_QUERY_DATE)).thenReturn(users);
 
         mockMvc.perform(get("/api/users/born-after")
-                        .param("date", testDate.toString()))
+                        .param("date", BORN_AFTER_QUERY_DATE.toString()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray())
-                .andExpect(jsonPath("$.length()").value(3));
+                .andExpect(jsonPath("$.length()").value(THIRD_ENTITY_ID.intValue()));
 
-        verify(userService).getUsersBornAfter(LocalDate.of(1990, 1, 1));
+        verify(userService).getUsersBornAfter(BORN_AFTER_QUERY_DATE);
     }
 
     @Test
-    @WithMockUser(username = "test@test.by", roles = {"USER"})
-    public void getAllUsers_ShouldReturnList() throws Exception {
+    @WithMockUser(username = USER_EMAIL, roles = {"USER"})
+    void getAllUsers_ShouldReturnList_WhenUsersExist() throws Exception {
         List<UserDto> userDtos = List.of(userDto);
 
         when(userService.getAllUsers()).thenReturn(userDtos);
@@ -200,28 +190,30 @@ public class UserControllerTest {
     }
 
     @Test
-    @WithMockUser(username = "test@test.by", roles = {"USER"})
-    public void getAllUsersWithPagination_ShouldReturnPage() throws Exception {
-        Page<UserDto> page = new PageImpl<>(List.of(new UserDto(), new UserDto()));
+    @WithMockUser(username = USER_EMAIL, roles = {"USER"})
+    void getAllUsersWithPagination_ShouldReturnPage_WhenUsersExist() throws Exception {
+        Page<UserDto> page = new PageImpl<>(List.of(
+                UserDtoGenerator.generateUserDtoForBatch(1),
+                UserDtoGenerator.generateUserDtoForBatch(2)
+        ));
 
-        when(userService.getAllUsersNativeWithPagination(0, 10)).thenReturn(page);
+        when(userService.getAllUsersNativeWithPagination(DEFAULT_PAGE, DEFAULT_PAGE_SIZE)).thenReturn(page);
 
         mockMvc.perform(get("/api/users/paginated")
-                        .param("page", "0")
-                        .param("size", "10"))
+                        .param("page", String.valueOf(DEFAULT_PAGE))
+                        .param("size", String.valueOf(DEFAULT_PAGE_SIZE)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content").isArray())
-                .andExpect(jsonPath("$.content.length()").value(2));
+                .andExpect(jsonPath("$.content.length()").value(PAGINATION_PAGE_SIZE));
 
-        verify(userService).getAllUsersNativeWithPagination(0, 10);
+        verify(userService).getAllUsersNativeWithPagination(DEFAULT_PAGE, DEFAULT_PAGE_SIZE);
     }
 
     @Test
-    @WithMockUser(username = "test@test.by", roles = {"USER"})
-    public void updateUser_ShouldReturnUpdatedUserDto() throws Exception {
-        UserDto responseDto = UserMapper.INSTANSE.toDto(UserGenerator.generateUser());
-        responseDto.setUserId(1l);
-        responseDto.setEmail("updated_email@test.by");
+    @WithMockUser(username = USER_EMAIL, roles = {"USER"})
+    void updateUser_ShouldReturnUpdatedUserDto_WhenUserExists() throws Exception {
+        UserDto responseDto = UserDtoGenerator.generateUserDtoWithId();
+        responseDto.setEmail(UPDATED_USER_EMAIL);
 
         when(userService.updateUser(USER_ID, userDto)).thenReturn(responseDto);
 
@@ -230,15 +222,15 @@ public class UserControllerTest {
                         .content(objectMapper.writeValueAsString(userDto)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.userId").value(USER_ID))
-                .andExpect(jsonPath("$.email").value("updated_email@test.by"));
+                .andExpect(jsonPath("$.email").value(UPDATED_USER_EMAIL));
 
         verify(userService).updateUser(USER_ID, userDto);
     }
 
     @Test
-    @WithMockUser(username = "test@test.by", roles = {"USER"})
-    public void updateUser_ShouldReturnNotFound() throws Exception {
-        userDto.setEmail("updated_email@test.by");
+    @WithMockUser(username = USER_EMAIL, roles = {"USER"})
+    void updateUser_ShouldReturnNotFound_WhenUserNotFound() throws Exception {
+        userDto.setEmail(UPDATED_USER_EMAIL);
 
         when(userService.updateUser(USER_ID, userDto))
                 .thenThrow(new UserNotFoundException("User wasn't found with id " + USER_ID));
@@ -252,8 +244,8 @@ public class UserControllerTest {
     }
 
     @Test
-    @WithMockUser(username = "test@test.by", roles = {"USER"})
-    public void deleteUser_ShouldReturnForbiddenForNonAdmin() throws Exception {
+    @WithMockUser(username = USER_EMAIL, roles = {"USER"})
+    void deleteUser_ShouldReturnForbidden_WhenNonAdmin() throws Exception {
         when(userService.deleteUser(USER_ID)).thenReturn(userDto);
 
         mockMvc.perform(delete("/api/users/{id}", USER_ID))
@@ -261,8 +253,8 @@ public class UserControllerTest {
     }
 
     @Test
-    @WithMockUser(username = "admin@test.by", authorities = {"ROLE_ADMIN"} )
-    public void deleteUser_ShouldReturnDeletedUserDto() throws Exception {
+    @WithMockUser(username = ADMIN_USER_EMAIL, authorities = {"ROLE_ADMIN"})
+    void deleteUser_ShouldReturnDeletedUserDto_WhenUserExists() throws Exception {
         when(userService.deleteUser(USER_ID)).thenReturn(userDto);
 
         mockMvc.perform(delete("/api/users/{id}", USER_ID))
@@ -273,8 +265,8 @@ public class UserControllerTest {
     }
 
     @Test
-    @WithMockUser(username = "admin@test.by", authorities = {"ROLE_ADMIN"} )
-    public void deleteUser_ShouldReturnNotFound() throws Exception {
+    @WithMockUser(username = ADMIN_USER_EMAIL, authorities = {"ROLE_ADMIN"})
+    void deleteUser_ShouldReturnNotFound_WhenUserNotFound() throws Exception {
         when(userService.deleteUser(USER_ID)).thenReturn(null);
 
         mockMvc.perform(delete("/api/users/{id}", USER_ID))

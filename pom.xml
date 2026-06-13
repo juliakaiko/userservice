@@ -30,12 +30,15 @@
 		<sonar.projectKey>juliakaiko_userservice</sonar.projectKey>
 		<sonar.host.url>https://sonarcloud.io</sonar.host.url>
 		<sonar.java.binaries>target/classes</sonar.java.binaries>
+        <sonar.coverage.jacoco.xmlReportPaths>
+            target/site/jacoco/jacoco.xml
+        </sonar.coverage.jacoco.xmlReportPaths>
         <jackson-databind.version>2.17.0</jackson-databind.version>
         <logstash-logback-encoder.version>7.4</logstash-logback-encoder.version>
         <postgresql.version>42.7.4</postgresql.version>
         <testcontainers-redis.version>2.2.2</testcontainers-redis.version>
         <spring-security-test.version>6.5.2</spring-security-test.version>
-        <common-filters-starter.version>1.0.0</common-filters-starter.version>
+        <common-filters-starter.version>1.0.1</common-filters-starter.version>
 	</properties>
 
     <repositories>
@@ -76,6 +79,11 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-actuator</artifactId>
         </dependency>
+        <dependency>
+            <groupId>io.micrometer</groupId>
+            <artifactId>micrometer-registry-prometheus</artifactId>
+        </dependency>
+
 		<!-- Spring Security + JWT (OAuth2 Resource Server) -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -305,12 +313,39 @@
 					<systemPropertyVariables>
 						<spring.profiles.active>test</spring.profiles.active>
 					</systemPropertyVariables>
+					<includes>
+						<include>**/*Test.java</include>
+						<include>**/*Tests.java</include>
+						<include>**/*IT.java</include>
+					</includes>
 					<forkCount>1</forkCount>
 					<reuseForks>true</reuseForks>
 					<parallel>none</parallel>
 					<runOrder>filesystem</runOrder>
 				</configuration>
 			</plugin>
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>0.8.12</version>
+                <executions>
+                    <!-- Attaches the Java Agent before running tests -->
+                    <execution>
+                        <id>prepare-agent</id>
+                        <goals>
+                            <goal>prepare-agent</goal>
+                        </goals>
+                    </execution>
+                    <!-- Generates an XML report after test execution -->
+                    <execution>
+                        <id>report</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>report</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
 		</plugins>
 	</build>
 </project>

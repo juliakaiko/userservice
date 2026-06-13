@@ -1,19 +1,20 @@
-package com.mymicroservice.userservice.mapper;
-
+package com.mymicroservice.userservice.unit.mapper;
 
 import com.mymicroservice.userservice.dto.UserDto;
+import com.mymicroservice.userservice.mapper.UserMapper;
 import com.mymicroservice.userservice.model.User;
 import com.mymicroservice.userservice.util.UserGenerator;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class UserMapperTest {
+class UserMapperTest {
 
     @Test
-    public void userToDto_whenOk_thenMapFieldsCorrectly() {
+    void toDto_ShouldMapFieldsCorrectly_WhenUserIsValid() {
         User user = UserGenerator.generateUser();
         UserDto userDto = UserMapper.INSTANSE.toDto(user);
+
         assertEquals(user.getUserId(), userDto.getUserId());
         assertEquals(user.getName(), userDto.getName());
         assertEquals(user.getSurname(), userDto.getSurname());
@@ -24,16 +25,17 @@ public class UserMapperTest {
     }
 
     @Test
-    public void userDtoToEntity_whenOk_thenMapFieldsCorrectly() {
+    void toEntity_ShouldMapFieldsCorrectly_WhenUserDtoIsValid() {
         User user = UserGenerator.generateUser();
         UserDto userDto = UserMapper.INSTANSE.toDto(user);
-        user = UserMapper.INSTANSE.toEntity(userDto);
-        assertEquals(userDto.getUserId(), user.getUserId());
-        assertEquals(userDto.getName(), user.getName());
-        assertEquals(userDto.getSurname(), user.getSurname());
-        assertEquals(userDto.getBirthDate(), user.getBirthDate());
-        assertEquals(userDto.getEmail(), user.getEmail());
-        assertEquals(userDto.getPassword(), user.getPassword());
-        assertEquals(userDto.getRole(), user.getRole());
+        User mappedUser = UserMapper.INSTANSE.toEntity(userDto);
+
+        assertEquals(userDto.getUserId(), mappedUser.getUserId());
+        assertEquals(userDto.getName(), mappedUser.getName());
+        assertEquals(userDto.getSurname(), mappedUser.getSurname());
+        assertEquals(userDto.getBirthDate(), mappedUser.getBirthDate());
+        assertEquals(userDto.getEmail(), mappedUser.getEmail());
+        assertEquals(userDto.getPassword(), mappedUser.getPassword());
+        assertEquals(userDto.getRole(), mappedUser.getRole());
     }
 }

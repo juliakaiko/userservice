@@ -1,40 +1,41 @@
-package com.mymicroservice.userservice.repository.testcontainer;
+package com.mymicroservice.userservice.integration.repository;
 
-import com.mymicroservice.userservice.configuration.TestContainersConfig;
+import com.mymicroservice.userservice.configuration.PostgresTestContainersConfig;
 import com.mymicroservice.userservice.model.Role;
 import com.mymicroservice.userservice.model.User;
 import com.mymicroservice.userservice.repository.UserRepository;
 import com.mymicroservice.userservice.util.UserGenerator;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
-import org.springframework.context.annotation.Import;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.ActiveProfiles;
+import org.testcontainers.junit.jupiter.Testcontainers;
 
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+import static com.mymicroservice.userservice.util.data.TestConstants.NON_EXISTENT_EMAIL;
+import static com.mymicroservice.userservice.util.data.TestConstants.NON_EXISTENT_ID;
+import static com.mymicroservice.userservice.util.data.TestConstants.REPOSITORY_BORN_AFTER_DATE;
+import static com.mymicroservice.userservice.util.data.TestConstants.REPOSITORY_NO_RESULTS_DATE;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@Slf4j
 @DataJpaTest
 @ActiveProfiles("test")
-@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE) // Disabling DataSource Replacement
-@Import(TestContainersConfig.class)
-public class UserRepositoryTest extends TestContainersConfig {
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
+@Testcontainers(disabledWithoutDocker = true)
+class UserRepositoryTest extends PostgresTestContainersConfig {
 
     @Autowired
     private UserRepository userRepository;
@@ -42,35 +43,34 @@ public class UserRepositoryTest extends TestContainersConfig {
     private static User expectedUser;
 
     @BeforeAll
-    static void setUp(){
+    static void setUpAll() {
         expectedUser = UserGenerator.generateUser();
     }
 
     @BeforeEach
     void init() {
         userRepository.deleteAll();
-        expectedUser = userRepository.save(expectedUser);
+        expectedUser = userRepository.save(UserGenerator.generateUser());
     }
 
     @Test
-    void findByEmail_shouldReturnUserWhenExists() {
+    void findByEmailIgnoreCase_ShouldReturnUser_WhenEmailExists() {
         Optional<User> actualUser = userRepository.findByEmailIgnoreCase(expectedUser.getEmail());
-        log.info("Test to find the User with email: {} "+ expectedUser.getEmail());
 
-        assertNotNull(actualUser.get());
+        assertNotNull(actualUser.orElse(null));
         assertEquals(expectedUser, actualUser.get());
         assertThat(actualUser).isPresent().contains(expectedUser);
     }
 
     @Test
-    public void findByEmail_shouldReturnEmptyWhenNotExists() {
-        Optional<User> actualUser = userRepository.findByEmailIgnoreCase("non-existing-email");
+    void findByEmailIgnoreCase_ShouldReturnEmpty_WhenEmailNotExists() {
+        Optional<User> actualUser = userRepository.findByEmailIgnoreCase(NON_EXISTENT_EMAIL);
 
         assertFalse(actualUser.isPresent());
     }
 
     @Test
-    public void findByUserIdIn_shouldReturnUsersWhenExist() {
+    void findByUserIdIn_ShouldReturnUsers_WhenUsersExist() {
         Set<Long> ids = Set.of(expectedUser.getUserId());
 
         List<User> actualUsers = userRepository.findByUserIdIn(ids);
@@ -80,51 +80,44 @@ public class UserRepositoryTest extends TestContainersConfig {
     }
 
     @Test
-    public void findByUserIdIn_shouldReturnEmptyListWhenNotExist() {
-        Set<Long> ids = Set.of(999L);
-
-        List<User> actualUsers = userRepository.findByUserIdIn(ids);
+    void findByUserIdIn_ShouldReturnEmptyList_WhenUsersNotExist() {
+        List<User> actualUsers = userRepository.findByUserIdIn(Set.of(NON_EXISTENT_ID));
 
         assertThat(actualUsers).isEmpty();
     }
 
     @Test
-    void findByRole_shouldReturnUserWhenExists() {
+    void findUsersByRole_ShouldReturnUsers_WhenRoleExists() {
         List<User> actualUsers = userRepository.findUsersByRole(Role.USER);
 
         assertThat(actualUsers).isNotEmpty();
         assertEquals(expectedUser, actualUsers.get(0));
-        assertThat(actualUsers).contains(expectedUser);
     }
 
     @Test
-    public void findByRole_shouldReturnEmptyWhenNotExists() {
+    void findUsersByRole_ShouldReturnEmptyList_WhenRoleNotExists() {
         List<User> actualUsers = userRepository.findUsersByRole(Role.ADMIN);
 
         assertTrue(actualUsers.isEmpty());
     }
 
     @Test
-    public void findUsersBornAfter_shouldReturnBornAfterUsers() {
-        LocalDate date = LocalDate.of(2000,1,1);
-        List<User> bornAfterUsers = userRepository.findUsersBornAfter(date);
+    void findUsersBornAfter_ShouldReturnUsers_WhenUsersBornAfterDate() {
+        List<User> bornAfterUsers = userRepository.findUsersBornAfter(REPOSITORY_BORN_AFTER_DATE);
 
         assertThat(bornAfterUsers).isNotEmpty();
-        assertTrue(bornAfterUsers.stream().allMatch(user ->
-                user.getBirthDate().isAfter(date)));
+        assertTrue(bornAfterUsers.stream().allMatch(user -> user.getBirthDate().isAfter(REPOSITORY_BORN_AFTER_DATE)));
     }
 
     @Test
-    public void findUsersBornAfter_shouldReturnEmptyList() {
-        LocalDate date = LocalDate.of(2020,1,1);
-
-        List<User> bornAfterUsers = userRepository.findUsersBornAfter(date);
+    void findUsersBornAfter_ShouldReturnEmptyList_WhenNoUsersBornAfterDate() {
+        List<User> bornAfterUsers = userRepository.findUsersBornAfter(REPOSITORY_NO_RESULTS_DATE);
 
         assertThat(bornAfterUsers).isEmpty();
     }
 
     @Test
-    public void findAllUsersNative_shouldReturnPaginatedResults() {
+    void findAllUsersNative_ShouldReturnPaginatedResults_WhenUsersExist() {
         Pageable pageable = PageRequest.of(0, 2);
 
         Page<User> page = userRepository.findAllUsersNative(pageable);
@@ -135,7 +128,7 @@ public class UserRepositoryTest extends TestContainersConfig {
     }
 
     @Test
-    public void findAllUsersNative_shouldReturnEmptyPageWhenNoCards() {
+    void findAllUsersNative_ShouldReturnEmptyPage_WhenNoUsersExist() {
         userRepository.deleteAll();
         Pageable pageable = PageRequest.of(0, 10);
 
