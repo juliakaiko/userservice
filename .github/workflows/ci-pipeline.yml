@@ -99,14 +99,16 @@ jobs:
 
       - name: SonarCloud Scan
         run: |
-          mvn -B verify sonar:sonar \
+          mvn -B clean verify sonar:sonar \
             -Dsonar.projectKey=juliakaiko_userservice \
             -Dsonar.projectName=UserService \
             -Dsonar.organization=juliakaiko \
             -Dsonar.sources=src/main/java \
             -Dsonar.tests=src/test/java \
-            -Dsonar.java.binaries=target/classes \
-            -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml
+            -Dsonar.java.binaries=target/classes,target/generated-sources/annotations \
+            -Dsonar.java.test.binaries=target/test-classes \
+            -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml \
+            -Dsonar.sourceEncoding=UTF-8
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: https://sonarcloud.io
