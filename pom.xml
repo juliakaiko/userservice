@@ -313,6 +313,11 @@
 					<systemPropertyVariables>
 						<spring.profiles.active>test</spring.profiles.active>
 					</systemPropertyVariables>
+					<includes>
+						<include>**/*Test.java</include>
+						<include>**/*Tests.java</include>
+						<include>**/*IT.java</include>
+					</includes>
 					<forkCount>1</forkCount>
 					<reuseForks>true</reuseForks>
 					<parallel>none</parallel>

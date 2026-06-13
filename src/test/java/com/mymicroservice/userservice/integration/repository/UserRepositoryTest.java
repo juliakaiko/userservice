@@ -1,6 +1,6 @@
 package com.mymicroservice.userservice.integration.repository;
 
-import com.mymicroservice.userservice.configuration.TestContainersConfig;
+import com.mymicroservice.userservice.configuration.PostgresTestContainersConfig;
 import com.mymicroservice.userservice.model.Role;
 import com.mymicroservice.userservice.model.User;
 import com.mymicroservice.userservice.repository.UserRepository;
@@ -35,7 +35,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @ActiveProfiles("test")
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @Testcontainers(disabledWithoutDocker = true)
-class UserRepositoryTest extends TestContainersConfig {
+class UserRepositoryTest extends PostgresTestContainersConfig {
 
     @Autowired
     private UserRepository userRepository;
