@@ -127,5 +127,5 @@ jobs:
           docker build \
             --build-arg GITHUB_USERNAME=${{ github.actor }} \
             --build-arg GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }} \
-            -t juliakaiko94/paymentservice:latest .
-          docker push juliakaiko94/paymentservice:latest
+            -t juliakaiko94/user-service:latest .
+          docker push juliakaiko94/user-service:latest
