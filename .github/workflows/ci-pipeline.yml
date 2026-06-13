@@ -98,18 +98,18 @@ jobs:
           cat target/site/jacoco/jacoco.xml | head -20
 
       - name: SonarCloud Scan
-        uses: SonarSource/sonarcloud-github-action@v2
+        run: |
+          mvn -B verify sonar:sonar \
+            -Dsonar.projectKey=juliakaiko_userservice \
+            -Dsonar.projectName=UserService \
+            -Dsonar.organization=juliakaiko \
+            -Dsonar.sources=src/main/java \
+            -Dsonar.tests=src/test/java \
+            -Dsonar.java.binaries=target/classes \
+            -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: https://sonarcloud.io
-        with:
-          args: >
-            -Dsonar.projectKey=juliakaiko_userservice
-            -Dsonar.projectName=UserService
-            -Dsonar.organization=juliakaiko
-            -Dsonar.java.binaries=target/classes
-            -Dsonar.java.libraries=target/unpacked-libs/*.jar
-            -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml
 
       # 10. Log in to Docker Hub
       - name: Login to Docker Hub
