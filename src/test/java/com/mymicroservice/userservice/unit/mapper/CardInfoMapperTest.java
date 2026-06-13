@@ -1,22 +1,24 @@
-package com.mymicroservice.userservice.mapper;
+package com.mymicroservice.userservice.unit.mapper;
 
 import com.mymicroservice.userservice.dto.CardInfoDto;
+import com.mymicroservice.userservice.mapper.CardInfoMapper;
 import com.mymicroservice.userservice.model.CardInfo;
 import com.mymicroservice.userservice.model.User;
 import com.mymicroservice.userservice.util.CardInfoGenerator;
 import com.mymicroservice.userservice.util.UserGenerator;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class CardInfoMapperTest {
+class CardInfoMapperTest {
 
     @Test
-    public void cardInfoToDto_whenOk_thenMapFieldsCorrectly() {
+    void toDto_ShouldMapFieldsCorrectly_WhenCardInfoIsValid() {
         User user = UserGenerator.generateUser();
         CardInfo cardInfo = CardInfoGenerator.generateCardInfo();
         cardInfo.setUserId(user);
         CardInfoDto cardInfoDto = CardInfoMapper.INSTANSE.toDto(cardInfo);
+
         assertEquals(cardInfo.getCardId(), cardInfoDto.getCardId());
         assertEquals(cardInfo.getNumber(), cardInfoDto.getNumber());
         assertEquals(cardInfo.getHolder(), cardInfoDto.getHolder());
@@ -25,14 +27,15 @@ public class CardInfoMapperTest {
     }
 
     @Test
-    public void cardInfoDtoToEntity_whenOk_thenMapFieldsCorrectly() {
+    void toEntity_ShouldMapFieldsCorrectly_WhenCardInfoDtoIsValid() {
         CardInfo cardInfo = CardInfoGenerator.generateCardInfo();
         CardInfoDto cardInfoDto = CardInfoMapper.INSTANSE.toDto(cardInfo);
-        cardInfo = CardInfoMapper.INSTANSE.toEntity(cardInfoDto);
-        assertEquals(cardInfoDto.getCardId(), cardInfo.getCardId());
-        assertEquals(cardInfoDto.getNumber(), cardInfo.getNumber());
-        assertEquals(cardInfoDto.getHolder(), cardInfo.getHolder());
-        assertEquals(cardInfoDto.getExpirationDate(), cardInfo.getExpirationDate());
-        assertEquals(cardInfoDto.getUserId(), cardInfo.getUserId().getUserId());
+        CardInfo mappedCardInfo = CardInfoMapper.INSTANSE.toEntity(cardInfoDto);
+
+        assertEquals(cardInfoDto.getCardId(), mappedCardInfo.getCardId());
+        assertEquals(cardInfoDto.getNumber(), mappedCardInfo.getNumber());
+        assertEquals(cardInfoDto.getHolder(), mappedCardInfo.getHolder());
+        assertEquals(cardInfoDto.getExpirationDate(), mappedCardInfo.getExpirationDate());
+        assertEquals(cardInfoDto.getUserId(), mappedCardInfo.getUserId().getUserId());
     }
 }

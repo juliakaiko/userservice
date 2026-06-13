@@ -1,32 +1,39 @@
-package com.mymicroservice.userservice.controller;
+package com.mymicroservice.userservice.unit.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mymicroservice.userservice.configuration.SecurityConfig;
+import com.mymicroservice.userservice.controller.CardInfoController;
 import com.mymicroservice.userservice.dto.CardInfoDto;
-import com.mymicroservice.userservice.mapper.CardInfoMapper;
-import com.mymicroservice.userservice.model.CardInfo;
 import com.mymicroservice.userservice.service.CardInfoService;
-import com.mymicroservice.userservice.util.CardInfoGenerator;
-import lombok.extern.slf4j.Slf4j;
+import com.mymicroservice.userservice.util.CardInfoDtoGenerator;
 import org.junit.jupiter.api.BeforeEach;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.context.annotation.Import;
-import org.springframework.data.domain.Page;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.LongStream;
 
+import static com.mymicroservice.userservice.util.data.TestConstants.CARD_NUMBER;
+import static com.mymicroservice.userservice.util.data.TestConstants.DEFAULT_PAGE;
+import static com.mymicroservice.userservice.util.data.TestConstants.DEFAULT_PAGE_SIZE;
+import static com.mymicroservice.userservice.util.data.TestConstants.ENTITY_ID;
+import static com.mymicroservice.userservice.util.data.TestConstants.PAGINATION_PAGE_SIZE;
+import static com.mymicroservice.userservice.util.data.TestConstants.SECOND_CARD_NUMBER;
+import static com.mymicroservice.userservice.util.data.TestConstants.SECOND_ENTITY_ID;
+import static com.mymicroservice.userservice.util.data.TestConstants.THIRD_ENTITY_ID;
+import static com.mymicroservice.userservice.util.data.TestConstants.USER_ID;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -36,14 +43,11 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import static org.mockito.Mockito.any;
-
 @WebMvcTest(controllers = CardInfoController.class)
 @AutoConfigureMockMvc(addFilters = false)
 @Import(SecurityConfig.class)
 @WithMockUser(roles = {"ADMIN", "USER"})
-@Slf4j
-public class CardInfoControllerTest {
+class CardInfoControllerTest {
 
     @MockBean
     private CardInfoService cardInfoService;
@@ -54,20 +58,15 @@ public class CardInfoControllerTest {
     @Autowired
     private ObjectMapper objectMapper;
 
-    private final static Long ENTITY_ID = 1L;
-    private final static String CARD_NUMBER = "1111222233334444";
-    private final static Long USER_ID = 1L;
     private CardInfoDto cardInfoDto;
 
     @BeforeEach
     void setUp() {
-        CardInfo card = CardInfoGenerator.generateCardInfo();
-        card.setCardId(1l);
-        cardInfoDto = CardInfoMapper.INSTANSE.toDto(card);
+        cardInfoDto = CardInfoDtoGenerator.generateCardInfoDtoWithId();
     }
 
     @Test
-    public void getCardInfoById_ShouldReturnCardInfoDto() throws Exception {
+    void getCardInfoById_ShouldReturnCardInfoDto_WhenCardInfoExists() throws Exception {
         when(cardInfoService.getCardInfoById(ENTITY_ID)).thenReturn(cardInfoDto);
 
         mockMvc.perform(get("/api/cards/{id}", ENTITY_ID))
@@ -78,7 +77,7 @@ public class CardInfoControllerTest {
     }
 
     @Test
-    public void getCardInfoById_ShouldReturnNotFound() throws Exception {
+    void getCardInfoById_ShouldReturnNotFound_WhenCardInfoNotFound() throws Exception {
         when(cardInfoService.getCardInfoById(ENTITY_ID)).thenReturn(null);
 
         mockMvc.perform(get("/api/cards/{id}", ENTITY_ID))
@@ -88,7 +87,7 @@ public class CardInfoControllerTest {
     }
 
     @Test
-    public void getCardInfoByNumber_ShouldReturnCardInfoDto() throws Exception {
+    void getCardInfoByNumber_ShouldReturnCardInfoDto_WhenCardInfoExists() throws Exception {
         when(cardInfoService.getCardInfoByNumber(CARD_NUMBER)).thenReturn(cardInfoDto);
 
         mockMvc.perform(get("/api/cards/find-by-number")
@@ -100,7 +99,7 @@ public class CardInfoControllerTest {
     }
 
     @Test
-    public void getCardInfoByNumber_ShouldReturnNotFound() throws Exception {
+    void getCardInfoByNumber_ShouldReturnNotFound_WhenCardInfoNotFound() throws Exception {
         when(cardInfoService.getCardInfoByNumber(CARD_NUMBER)).thenReturn(null);
 
         mockMvc.perform(get("/api/cards/find-by-number")
@@ -111,23 +110,26 @@ public class CardInfoControllerTest {
     }
 
     @Test
-    public void getCardInfoByIds_ShouldReturnList() throws Exception {
-        List<CardInfoDto> cardInfoDtos = List.of(new CardInfoDto(), new CardInfoDto());
-        Set<Long> ids = Set.of(1L, 2L, 3L);
+    void getCardInfoByIds_ShouldReturnList_WhenCardInfosExist() throws Exception {
+        List<CardInfoDto> cardInfoDtos = List.of(
+                CardInfoDtoGenerator.generateCardInfoDtoForBatch(1, USER_ID),
+                CardInfoDtoGenerator.generateCardInfoDtoForBatch(2, USER_ID)
+        );
+        Set<Long> ids = Set.of(ENTITY_ID, SECOND_ENTITY_ID, THIRD_ENTITY_ID);
 
         when(cardInfoService.getCardInfoIdIn(ids)).thenReturn(cardInfoDtos);
 
         mockMvc.perform(get("/api/cards/find-by-ids")
-                        .param("ids", "1", "2", "3"))
+                        .param("ids", ENTITY_ID.toString(), SECOND_ENTITY_ID.toString(), THIRD_ENTITY_ID.toString()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray())
-                .andExpect(jsonPath("$.length()").value(2));
+                .andExpect(jsonPath("$.length()").value(PAGINATION_PAGE_SIZE));
 
-        verify(cardInfoService).getCardInfoIdIn(Set.of(1L, 2L, 3L));
+        verify(cardInfoService).getCardInfoIdIn(Set.of(ENTITY_ID, SECOND_ENTITY_ID, THIRD_ENTITY_ID));
     }
 
     @Test
-    public void getCardInfoByUserId_ShouldReturnList() throws Exception {
+    void getCardInfoByUserId_ShouldReturnList_WhenCardInfosExist() throws Exception {
         List<CardInfoDto> cardInfoDtos = List.of(cardInfoDto);
 
         when(cardInfoService.getByUserId(USER_ID)).thenReturn(cardInfoDtos);
@@ -141,33 +143,23 @@ public class CardInfoControllerTest {
     }
 
     @Test
-    public void getExpiredCards_ShouldReturnList() throws Exception {
-        when(cardInfoService.createCardInfo(any(CardInfoDto.class)))  // Mock for createCardInfo()
-                .thenAnswer(invocation -> invocation.getArgument(0));
-
-        List<CardInfoDto> cardInfos = LongStream.range(1, 4) // stream:  1,2,3
-                .mapToObj(i -> cardInfoService.createCardInfo(
-                        CardInfoDto.builder()
-                                .cardId(i)
-                                .number("111122223333444"+i)
-                                .holder("TestUser")
-                                .expirationDate(LocalDate.of(2020, 3, 3))
-                                .userId(USER_ID)
-                                .build()
-                )).collect(Collectors.toList());
+    void getExpiredCards_ShouldReturnList_WhenExpiredCardsExist() throws Exception {
+        List<CardInfoDto> cardInfos = LongStream.rangeClosed(ENTITY_ID, THIRD_ENTITY_ID)
+                .mapToObj(i -> CardInfoDtoGenerator.generateCardInfoDtoForBatch(i, USER_ID))
+                .collect(Collectors.toList());
 
         when(cardInfoService.getExpiredCards()).thenReturn(cardInfos);
 
         mockMvc.perform(get("/api/cards/expired", USER_ID))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray())
-                .andExpect(jsonPath("$.length()").value(3));
+                .andExpect(jsonPath("$.length()").value(THIRD_ENTITY_ID.intValue()));
 
         verify(cardInfoService).getExpiredCards();
     }
 
     @Test
-    public void getAllCardInfos_ShouldReturnList() throws Exception {
+    void getAllCardInfos_ShouldReturnList_WhenCardInfosExist() throws Exception {
         List<CardInfoDto> cardInfoDtos = List.of(cardInfoDto);
 
         when(cardInfoService.getAllCardInfos()).thenReturn(cardInfoDtos);
@@ -181,23 +173,26 @@ public class CardInfoControllerTest {
     }
 
     @Test
-    public void getAllCardInfosWithPagination_ShouldReturnPage() throws Exception {
-        Page<CardInfoDto> page = new PageImpl<>(List.of(new CardInfoDto(), new CardInfoDto()));
+    void getAllCardInfosWithPagination_ShouldReturnPage_WhenCardInfosExist() throws Exception {
+        Page<CardInfoDto> page = new PageImpl<>(List.of(
+                CardInfoDtoGenerator.generateCardInfoDtoForBatch(1, USER_ID),
+                CardInfoDtoGenerator.generateCardInfoDtoForBatch(2, USER_ID)
+        ));
 
-        when(cardInfoService.getAllCardInfosNativeWithPagination(0, 10)).thenReturn(page);
+        when(cardInfoService.getAllCardInfosNativeWithPagination(DEFAULT_PAGE, DEFAULT_PAGE_SIZE)).thenReturn(page);
 
         mockMvc.perform(get("/api/cards/paginated")
-                        .param("page", "0")
-                        .param("size", "10"))
+                        .param("page", String.valueOf(DEFAULT_PAGE))
+                        .param("size", String.valueOf(DEFAULT_PAGE_SIZE)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content").isArray())
-                .andExpect(jsonPath("$.content.length()").value(2));
+                .andExpect(jsonPath("$.content.length()").value(PAGINATION_PAGE_SIZE));
 
-        verify(cardInfoService).getAllCardInfosNativeWithPagination(0, 10);
+        verify(cardInfoService).getAllCardInfosNativeWithPagination(DEFAULT_PAGE, DEFAULT_PAGE_SIZE);
     }
 
     @Test
-    public void createCardInfo_ShouldReturnCreatedCardDto() throws Exception {
+    void createCardInfo_ShouldReturnCreatedCardDto_WhenDtoIsValid() throws Exception {
         when(cardInfoService.createCardInfo(any(CardInfoDto.class))).thenReturn(cardInfoDto);
 
         mockMvc.perform(post("/api/cards/add")
@@ -211,10 +206,9 @@ public class CardInfoControllerTest {
     }
 
     @Test
-    public void updateCardInfo_ShouldReturnUpdatedCardDto() throws Exception {
-        CardInfoDto responseDto = CardInfoMapper.INSTANSE.toDto(CardInfoGenerator.generateCardInfo());
-        responseDto.setCardId(1l);
-        responseDto.setNumber("1111555577779999");
+    void updateCardInfo_ShouldReturnUpdatedCardDto_WhenCardInfoExists() throws Exception {
+        CardInfoDto responseDto = CardInfoDtoGenerator.generateCardInfoDtoWithId();
+        responseDto.setNumber(SECOND_CARD_NUMBER);
 
         when(cardInfoService.updateCardInfo(ENTITY_ID, cardInfoDto)).thenReturn(responseDto);
 
@@ -223,16 +217,13 @@ public class CardInfoControllerTest {
                         .content(objectMapper.writeValueAsString(cardInfoDto)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.cardId").value(ENTITY_ID))
-                .andExpect(jsonPath("$.number").value("1111555577779999"));
+                .andExpect(jsonPath("$.number").value(SECOND_CARD_NUMBER));
 
         verify(cardInfoService).updateCardInfo(ENTITY_ID, cardInfoDto);
     }
 
     @Test
-    public void updateCardInfo_ShouldReturnNotFound() throws Exception {
-        CardInfoDto responseDto = CardInfoMapper.INSTANSE.toDto(CardInfoGenerator.generateCardInfo());
-        responseDto.setNumber("1111555577779999");
-
+    void updateCardInfo_ShouldReturnNotFound_WhenCardInfoNotFound() throws Exception {
         when(cardInfoService.updateCardInfo(ENTITY_ID, cardInfoDto)).thenReturn(null);
 
         mockMvc.perform(put("/api/cards/{id}", ENTITY_ID)
@@ -244,7 +235,7 @@ public class CardInfoControllerTest {
     }
 
     @Test
-    public void deleteCardInfo_ShouldReturnDeletedCardDto() throws Exception {
+    void deleteCardInfo_ShouldReturnDeletedCardDto_WhenCardInfoExists() throws Exception {
         when(cardInfoService.deleteCardInfo(ENTITY_ID)).thenReturn(cardInfoDto);
 
         mockMvc.perform(delete("/api/cards/{id}", ENTITY_ID))
@@ -255,7 +246,7 @@ public class CardInfoControllerTest {
     }
 
     @Test
-    public void deleteCardInfo_ShouldReturnNotFound() throws Exception {
+    void deleteCardInfo_ShouldReturnNotFound_WhenCardInfoNotFound() throws Exception {
         when(cardInfoService.deleteCardInfo(ENTITY_ID)).thenReturn(null);
 
         mockMvc.perform(delete("/api/cards/{id}", ENTITY_ID))

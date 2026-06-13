@@ -14,32 +14,22 @@ import java.time.Duration;
 
 @Slf4j
 @Testcontainers(disabledWithoutDocker = true)
-public class TestContainersConfig {
+public abstract class TestContainersConfig {
 
     @Container
-    public static final PostgreSQLContainer<?> postgreSQLContainer = new PostgreSQLContainer<>("postgres:15-alpine") //postgres:15
+    protected static final PostgreSQLContainer<?> postgreSQLContainer = new PostgreSQLContainer<>("postgres:15-alpine")
             .withDatabaseName("test")
             .withUsername("user")
             .withPassword("password")
             .waitingFor(Wait.forLogMessage(".*database system is ready to accept connections.*\\n", 1)
-                .withStartupTimeout(Duration.ofSeconds(120))
-            );
+                    .withStartupTimeout(Duration.ofSeconds(120)));
 
     @Container
-    public static GenericContainer<?> redisContainer = new GenericContainer<>(DockerImageName.parse("redis:7-alpine"))
+    protected static final GenericContainer<?> redisContainer = new GenericContainer<>(DockerImageName.parse("redis:7-alpine"))
             .withExposedPorts(6379);
-
-    static {
-        postgreSQLContainer.start();
-        redisContainer.start();
-        log.info("PostgreSQL JDBC URL: {}", postgreSQLContainer.getJdbcUrl());
-        log.info("Redis Host: {}, Port: {}", redisContainer.getHost(), redisContainer.getMappedPort(6379));
-    }
 
     @DynamicPropertySource
     static void configureProperties(DynamicPropertyRegistry registry) {
-        String jdbcUrl = postgreSQLContainer.getJdbcUrl();
-        log.info("PostgreSQL URL: {}", jdbcUrl);
         registry.add("spring.datasource.url", postgreSQLContainer::getJdbcUrl);
         registry.add("spring.datasource.username", postgreSQLContainer::getUsername);
         registry.add("spring.datasource.password", postgreSQLContainer::getPassword);
@@ -50,5 +40,6 @@ public class TestContainersConfig {
 
         registry.add("spring.jpa.hibernate.ddl-auto", () -> "create-drop");
         registry.add("spring.jpa.show-sql", () -> "true");
+        registry.add("spring.liquibase.enabled", () -> "false");
     }
 }
