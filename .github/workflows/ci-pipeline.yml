@@ -74,7 +74,7 @@ jobs:
           SPRING_DATASOURCE_USERNAME: test
           SPRING_DATASOURCE_PASSWORD: test
         run: |
-          mvn -B clean install -e -X -Dspring.test.constructor.autowire.mode=all
+          mvn -B clean verify -e -Dspring.test.constructor.autowire.mode=all
           pkill -f surefirebooter || true           # Kill any stuck test processes
 
       # 7. Upload test reports if tests fail
@@ -92,6 +92,11 @@ jobs:
           unzip -q -j target/*.jar 'BOOT-INF/lib/*.jar' -d target/unpacked-libs || echo "No libraries found in JAR"
 
       # 9. Static code analysis with SonarCloud
+      - name: Check JaCoCo
+        run: |
+          ls -R target/site/jacoco
+          cat target/site/jacoco/jacoco.xml | head -20
+
       - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@v2
         env:
@@ -104,6 +109,7 @@ jobs:
             -Dsonar.organization=juliakaiko
             -Dsonar.java.binaries=target/classes
             -Dsonar.java.libraries=target/unpacked-libs/*.jar
+            -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml
 
       # 10. Log in to Docker Hub
       - name: Login to Docker Hub
