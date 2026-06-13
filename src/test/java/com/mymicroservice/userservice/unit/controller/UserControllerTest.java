@@ -36,6 +36,8 @@ import static com.mymicroservice.userservice.util.data.TestConstants.SECOND_ENTI
 import static com.mymicroservice.userservice.util.data.TestConstants.THIRD_ENTITY_ID;
 import static com.mymicroservice.userservice.util.data.TestConstants.UPDATED_USER_EMAIL;
 import static com.mymicroservice.userservice.util.data.TestConstants.USER_EMAIL;
+import static com.mymicroservice.userservice.util.data.TestConstants.USER_NAME;
+import static com.mymicroservice.userservice.util.data.TestConstants.USER_SURNAME;
 import static com.mymicroservice.userservice.util.data.TestConstants.USER_ID;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
@@ -70,6 +72,18 @@ class UserControllerTest {
 
     private void disableAnnotationsInObjectMapper() {
         objectMapper.disable(MapperFeature.USE_ANNOTATIONS);
+    }
+
+    @Test
+    @WithMockUser(username = USER_EMAIL, roles = {"USER"})
+    void sayHello_ShouldReturnGreeting_WhenUserIsAuthenticated() throws Exception {
+        when(userService.getUsersByEmail(USER_EMAIL)).thenReturn(userDto);
+
+        mockMvc.perform(get("/api/users/hello"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.message").value("Hello, " + USER_NAME + " " + USER_SURNAME));
+
+        verify(userService).getUsersByEmail(USER_EMAIL);
     }
 
     @Test
@@ -223,6 +237,19 @@ class UserControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.userId").value(USER_ID))
                 .andExpect(jsonPath("$.email").value(UPDATED_USER_EMAIL));
+
+        verify(userService).updateUser(USER_ID, userDto);
+    }
+
+    @Test
+    @WithMockUser(username = USER_EMAIL, roles = {"USER"})
+    void updateUser_ShouldReturnNotFound_WhenUpdatedUserIsNull() throws Exception {
+        when(userService.updateUser(USER_ID, userDto)).thenReturn(null);
+
+        mockMvc.perform(put("/api/users/{id}", USER_ID)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(userDto)))
+                .andExpect(status().isNotFound());
 
         verify(userService).updateUser(USER_ID, userDto);
     }

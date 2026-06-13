@@ -73,6 +73,19 @@ class InternalControllerTest {
     }
 
     @Test
+    void createUser_ShouldReturnNotFound_WhenCreatedUserIsNull() throws Exception {
+        when(userService.createUser(any(UserDto.class))).thenReturn(null);
+
+        mockMvc.perform(post("/api/internal/users/")
+                        .header(INTERNAL_CALL_HEADER, INTERNAL_CALL_TRUE)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(userDto)))
+                .andExpect(status().isNotFound());
+
+        verify(userService).createUser(any(UserDto.class));
+    }
+
+    @Test
     void createUser_ShouldReturnForbidden_WhenHeaderMissing() throws Exception {
         mockMvc.perform(post("/api/internal/users/")
                         .contentType(MediaType.APPLICATION_JSON)
